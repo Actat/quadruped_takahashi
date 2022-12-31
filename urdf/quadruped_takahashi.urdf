@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<robot name="quadruped_takahashi">
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+
+    <material name="white">
+        <color rgba="1 1 1 1"/>
+    </material>
+
+    <material name="blue">
+        <color rgba="0 0 1 1"/>
+    </material>
+
+    <link name="base_link">
+        <visual>
+            <geometry>
+                <box size="0.24 0.11 0.012"/>
+            </geometry>
+            <origin xyz="0 0 0.045"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="lfleg0">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="lfleg1">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="lfleg2">
+        <visual>
+            <geometry>
+                <box size="0.036 0.0545 0.1"/>
+            </geometry>
+            <origin xyz="-0.002 0.0057 -0.05"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="lfleg3">
+        <visual>
+            <geometry>
+                <cylinder length="0.09" radius="0.003"/>
+            </geometry>
+            <origin xyz="0 0 -0.045"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="lfleg4">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+    </link>
+
+    <link name="rfleg0">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="rfleg1">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="rfleg2">
+        <visual>
+            <geometry>
+                <box size="0.036 0.0545 0.1"/>
+            </geometry>
+            <origin xyz="-0.002 -0.0057 -0.05"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="rfleg3">
+        <visual>
+            <geometry>
+                <cylinder length="0.09" radius="0.003"/>
+            </geometry>
+            <origin xyz="0 0 -0.045"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="rfleg4">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+    </link>
+
+    <link name="lhleg0">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="lhleg1">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="lhleg2">
+        <visual>
+            <geometry>
+                <box size="0.036 0.0545 0.1"/>
+            </geometry>
+            <origin xyz="-0.002 0.0057 -0.05"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="lhleg3">
+        <visual>
+            <geometry>
+                <cylinder length="0.09" radius="0.003"/>
+            </geometry>
+            <origin xyz="0 0 -0.045"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="lhleg4">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+    </link>
+
+    <link name="rhleg0">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="rhleg1">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <origin xyz="0 0 0"/>
+            <material name="blue"/>
+        </visual>
+    </link>
+
+    <link name="rhleg2">
+        <visual>
+            <geometry>
+                <box size="0.036 0.0545 0.1"/>
+            </geometry>
+            <origin xyz="-0.002 -0.0057 -0.05"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="rhleg3">
+        <visual>
+            <geometry>
+                <cylinder length="0.09" radius="0.003"/>
+            </geometry>
+            <origin xyz="0 0 -0.045"/>
+            <material name="white"/>
+        </visual>
+    </link>
+
+    <link name="rhleg4">
+        <visual>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+    </link>
+
+    <joint name="base_lfleg0" type="fixed">
+        <parent link="base_link"/>
+        <child link="lfleg0"/>
+        <origin xyz="0.076 0.04 0"/>
+    </joint>
+
+    <joint name="lf0" type="revolute">
+        <parent link="lfleg0"/>
+        <child link="lfleg1"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-0.1745328888" upper="0.785398" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="lf1" type="revolute">
+        <parent link="lfleg1"/>
+        <child link="lfleg2"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.570796" upper="0" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="lf2" type="revolute">
+        <parent link="lfleg2"/>
+        <child link="lfleg3"/>
+        <origin xyz="0 0 -0.1"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="0" upper="2.7925262222" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="lf3" type="fixed">
+        <parent link="lfleg3"/>
+        <child link="lfleg4"/>
+        <origin xyz="0 0 -0.09"/>
+    </joint>
+
+    <joint name="base_rfleg0" type="fixed">
+        <parent link="base_link"/>
+        <child link="rfleg0"/>
+        <origin xyz="0.076 -0.04 0"/>
+    </joint>
+
+    <joint name="rf0" type="revolute">
+        <parent link="rfleg0"/>
+        <child link="rfleg1"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-0.785398" upper="0.1745328888" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="rf1" type="revolute">
+        <parent link="rfleg1"/>
+        <child link="rfleg2"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-1.570796" upper="0" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="rf2" type="revolute">
+        <parent link="rfleg2"/>
+        <child link="rfleg3"/>
+        <origin xyz="0 0 -0.1"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="0" upper="2.7925262222" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="rf3" type="fixed">
+        <parent link="rfleg3"/>
+        <child link="rfleg4"/>
+        <origin xyz="0 0 -0.09"/>
+    </joint>
+
+    <joint name="base_lhleg0" type="fixed">
+        <parent link="base_link"/>
+        <child link="lhleg0"/>
+        <origin xyz="-0.076 0.04 0"/>
+    </joint>
+
+    <joint name="lh0" type="revolute">
+        <parent link="lhleg0"/>
+        <child link="lhleg1"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-0.1745328888" upper="0.785398" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="lh1" type="revolute">
+        <parent link="lhleg1"/>
+        <child link="lhleg2"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="0" upper="1.570796" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="lh2" type="revolute">
+        <parent link="lhleg2"/>
+        <child link="lhleg3"/>
+        <origin xyz="0 0 -0.1"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-2.7925262222" upper="0" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="lh3" type="fixed">
+        <parent link="lhleg3"/>
+        <child link="lhleg4"/>
+        <origin xyz="0 0 -0.09"/>
+    </joint>
+
+    <joint name="base_rhleg0" type="fixed">
+        <parent link="base_link"/>
+        <child link="rhleg0"/>
+        <origin xyz="-0.076 -0.04 0"/>
+    </joint>
+
+    <joint name="rh0" type="revolute">
+        <parent link="rhleg0"/>
+        <child link="rhleg1"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="1 0 0"/>
+        <limit lower="-0.785398" upper="0.1745328888" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="rh1" type="revolute">
+        <parent link="rhleg1"/>
+        <child link="rhleg2"/>
+        <origin xyz="0 0 0"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="0" upper="1.570796" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="rh2" type="revolute">
+        <parent link="rhleg2"/>
+        <child link="rhleg3"/>
+        <origin xyz="0 0 -0.1"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-2.7925262222" upper="0" effort="0" velocity="0"/>
+    </joint>
+
+    <joint name="rh3" type="fixed">
+        <parent link="rhleg3"/>
+        <child link="rhleg4"/>
+        <origin xyz="0 0 -0.09"/>
+    </joint>
+</robot>

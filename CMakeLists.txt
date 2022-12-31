@@ -40,7 +40,7 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME})
 
 install(
-  DIRECTORY launch
+  DIRECTORY launch urdf rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
