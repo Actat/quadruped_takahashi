@@ -17,6 +17,47 @@ import lifecycle_msgs.msg
 
 
 def generate_launch_description():
+    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+
+    urdf_file_name = 'quadruped_takahashi.urdf'
+    urdf_path = os.path.join(
+        get_package_share_directory('quadruped_takahashi'),
+        'urdf',
+        urdf_file_name
+    )
+    with open(urdf_path, 'r') as infp:
+        robot_desc = infp.read()
+
+    rviz_file_name = 'rviz_config.rviz'
+    rviz_path = os.path.join(
+        get_package_share_directory('quadruped_takahashi'),
+        'rviz',
+        rviz_file_name
+    )
+
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'robot_description': robot_desc,
+        }],
+        arguments=[urdf_path],
+    )
+    static_transform_publisher_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
+    )
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_path]
+    )
 
     kondo_b3m_ros2_node = Node(
         package='kondo_b3m_ros2',
@@ -39,6 +80,9 @@ def generate_launch_description():
     )
 
     ld = LaunchDescription()
+    ld.add_action(robot_state_publisher_node)
+    ld.add_action(static_transform_publisher_node)
+    ld.add_action(rviz_node)
     ld.add_action(kondo_b3m_ros2_node)
 
     return ld
