@@ -4,6 +4,10 @@
         <color rgba="0 0 0 1"/>
     </material>
 
+    <material name="clear">
+        <color rgba="1 1 1 0.5"/>
+    </material>
+
     <material name="white">
         <color rgba="1 1 1 1"/>
     </material>
@@ -18,7 +22,7 @@
                 <box size="0.24 0.11 0.012"/>
             </geometry>
             <origin xyz="0 0 0.045"/>
-            <material name="white"/>
+            <material name="clear"/>
         </visual>
     </link>
 
