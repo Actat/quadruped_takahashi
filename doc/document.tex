@@ -142,4 +142,52 @@
   あるウインドウで\texttt{\$ ros2 launch quadruped\_takahashi launch.py}を実行して起動し，
   別のウインドウで\texttt{\$ ros2 topic echo /joint\_states}することで各関節の角度・角速度が出力されていることを確認した．
 
+  \section{URDFファイルの作成}
+
+  URDFファイルの作成にあたってロボットの関節に関する座標系を設定する．
+  初めに左前脚を考える（図\ref{fig:lfleg_coords}）．
+  2つのHipの関節は軸が交わるように作られており，この交点を脚の付け根とする．
+  脚の付け根を原点としてロボットの前方に$x$軸，左方向に$y$軸，鉛直上方向に$z$軸をとった座標系を$\Sigma_\mathrm{lf0}$とする．
+  $\Sigma_\mathrm{lf0}$の$x$軸はHip ab/adductionの関節軸と一致しており，
+  この軸周りに$\theta_\mathrm{lf0}$回転した座標系を$\Sigma_\mathrm{lf1}$とする．
+  $\theta_\mathrm{lf0}$は$x$軸の方向を正とする．
+  $\Sigma_\mathrm{lf1}$の$y$軸はHip flextion/extensionの関節軸と一致しており，
+  この軸周りに$\Sigma_\mathrm{lf1}$回転した座標系を$\Sigma_\mathrm{lf2}$とする．
+  $\Sigma_\mathrm{lf1}$は$y$軸の方向を正とする．
+  この座標系$\Sigma_\mathrm{lf2}$は腿のリンクと対応しており，腿は$-z$の方向にのびている．
+  膝関節は$\Sigma_\mathrm{lf2}$において$[0, 0, -0.1]\,\si{m}$の位置に存在する．
+  この位置を原点とし，$y$軸周りに$\theta_\mathrm{lf2}$回転した座標系を$\Sigma_\mathrm{lf3}$とする．
+  この座標系は脛のリンクと対応しており，$[0, 0, -0.1]\,\si{m}$の位置が足の球の中心になる．
+
+  \begin{figure*}[htb]
+    \centering
+    \input{fig_lfleg_coords.pdf_tex}
+    \caption{
+      左前脚の座標系の設定．
+      脚は３つの関節軸を持っておりそれぞれが独立に回転する．
+      脚を垂直に伸ばした状態で２つの尻関節の交点と足の球面の中心を結ぶ線分上に各座標系の原点を設定する．
+      それぞれの関節の回転角を$\theta_\mathrm{lf0}, \theta_\mathrm{lf1}, \theta_\mathrm{lf2}$とする．
+    }
+    \label{fig:lfleg_coords}
+  \end{figure*}
+
+  他の脚にも同様に3つの関節角と4つの座標系を定義する．
+  すべて座標軸は直立したときに，$x$軸が前方，$y$軸は左方を向くように設定する．
+  関節角の向きは$x, y$軸の正方向によって定める．
+
+  ロボットの中心となるbase\_linkの位置は，4つのhip jointの中心に定める．
+  座標系の向きは$x$軸が前方，$y$軸は左方，$z$軸が鉛直上方である．
+
+  URDFファイルを作成して，CMakeLists.txtに追記した．
+  rvizのconfigファイルも同様にCMakeLists.txtに追記した．
+  launch.pyを編集し，rvizを起動して/joint\_statesの関節角をモデルの表示に反映させる．
+  base\_linkを固定して表示させることができた（図\ref{fig:urdf_rviz_screen}）．
+
+  \begin{figure*}[htb]
+    \centering
+    \includegraphics[width=15cm]{urdf_rviz_screen.png}
+    \caption{URDFファイルを読み込んで表示するrvizの画面}
+    \label{fig:urdf_rviz_screen}
+  \end{figure*}
+
 \end{document}

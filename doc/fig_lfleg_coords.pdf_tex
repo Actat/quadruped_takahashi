@@ -1,0 +1,81 @@
+%% Creator: Inkscape 1.1.2 (b8e25be833, 2022-02-05), www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'fig_lfleg_coords.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \newcommand*\fsize{\dimexpr\f@size pt\relax}%
+  \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{425.19685039bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.33333333)%
+    \lineheight{1}%
+    \setlength\tabcolsep{0pt}%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{fig_lfleg_coords.pdf}}%
+    \put(0.65927795,0.30828964){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{z}_\mathrm{lf0}$\end{tabular}}}}%
+    \put(0.57109751,0.29520535){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{z}_\mathrm{lf1}$\end{tabular}}}}%
+    \put(0.82578863,0.30751496){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{z}_\mathrm{lf1}$\end{tabular}}}}%
+    \put(0.93540527,0.3083639){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{z}_\mathrm{lf2}$\end{tabular}}}}%
+    \put(0.7650942,0.16149748){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{z}_\mathrm{lf3}$\end{tabular}}}}%
+    \put(0.52961807,0.0544073){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{y}_\mathrm{lf3}$\end{tabular}}}}%
+    \put(0.31452873,0.16586322){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{x}_\mathrm{lf0}$\end{tabular}}}}%
+    \put(0.31452873,0.14252496){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{x}_\mathrm{lf1}$\end{tabular}}}}%
+    \put(0.31452873,0.11918671){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{x}_\mathrm{lf2}$\end{tabular}}}}%
+    \put(0.52961807,0.16574187){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{y}_\mathrm{lf0}$\end{tabular}}}}%
+    \put(0.52961807,0.14240362){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{y}_\mathrm{lf1}$\end{tabular}}}}%
+    \put(0.52961807,0.11906535){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\bm{y}_\mathrm{lf2}$\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{fig_lfleg_coords.pdf}}%
+    \put(0.65418421,0.23867665){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\theta_\mathrm{lf0}$\end{tabular}}}}%
+    \put(0.90534261,0.25668983){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$-\theta_\mathrm{lf1}$\end{tabular}}}}%
+    \put(0.83799891,0.13280933){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}$\theta_\mathrm{lf2}$\end{tabular}}}}%
+    \put(0.18437678,0.30299625){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Hip ab/adduction motor\end{tabular}}}}%
+    \put(0.18437678,0.25325498){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Thigh link\end{tabular}}}}%
+    \put(0.17808366,0.08291445){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Shin link\end{tabular}}}}%
+    \put(0.18437678,0.2035137){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Sphere foot\end{tabular}}}}%
+    \put(0.01597645,0.01400057){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Hip flexion/extension motor\end{tabular}}}}%
+    \put(0.05115577,0.04845751){\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Knee flexion/extension motor\end{tabular}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{fig_lfleg_coords.pdf}}%
+  \end{picture}%
+\endgroup%
