@@ -4,6 +4,7 @@
 \usepackage{amsmath, amssymb}
 \usepackage{bm}
 \usepackage{siunitx}
+\usepackage{listings}
 
 \usepackage{graphicx}
 \usepackage{svg}
@@ -100,5 +101,45 @@
       \hline
     \end{tabular}
   \end{table}
+
+  \section{Packageの作成}
+
+  別のディレクトリで
+  \texttt{\$ ros2 pkg create --build-type ament\_cmake --node-name quadruped\_takahashi quadruped\_takahashi}
+  を実行してpackage.xml, CMakeLists.txt, quadruped\_takahashi.cppを作成した．
+  その後，作成したファイルをこのリポジトリ内へ移動した．
+
+  \section{モータとの通信}
+
+  モータとの通信にはActat/kondo\_b3m\_ros2を用いる．
+  motor\_classブランチ\footnote{このプロジェクトでうまく動作することを確認したらmasterにする予定である．}に合わせて
+  launchファイルを用意し，通信ができることを確認する．
+  以下にlaunchファイルのうち，kondo\_b3m\_ros2のノードの設定に関する部分を抜粋する．
+  軸の方向を反転しているのは，後述する座標系に合わせるためである．
+
+  \begin{lstlisting}[basicstyle=\ttfamily, language=Python]
+    kondo_b3m_ros2_node = Node(
+      package='kondo_b3m_ros2',
+      executable='kondo_b3m',
+      remappings=[('b3m_joint_state', 'joint_states')],
+      parameters=[{'motor_list': [
+        "{'id': 0, 'name': 'lf0', 'direction': False}",
+        "{'id': 1, 'name': 'lf1', 'direction': False}",
+        "{'id': 2, 'name': 'lf2', 'direction': False}",
+        "{'id': 3, 'name': 'rf0', 'direction': False}",
+        "{'id': 4, 'name': 'rf1'}",
+        "{'id': 5, 'name': 'rf2'}",
+        "{'id': 6, 'name': 'lh0'}",
+        "{'id': 7, 'name': 'lh1', 'direction': False}",
+        "{'id': 8, 'name': 'lh2', 'direction': False}",
+        "{'id': 9, 'name': 'rh0'}",
+        "{'id': 10, 'name': 'rh1'}",
+        "{'id': 11, 'name': 'rh2'}"
+      ]}],
+    )
+  \end{lstlisting}
+
+  あるウインドウで\texttt{\$ ros2 launch quadruped\_takahashi launch.py}を実行して起動し，
+  別のウインドウで\texttt{\$ ros2 topic echo /joint\_states}することで各関節の角度・角速度が出力されていることを確認した．
 
 \end{document}
