@@ -33,9 +33,10 @@ void quadruped_takahashi_odometry::callback_imu_(
   auto tf_lh4  = lookup_transform_("base_link", "lhleg4", stamp, timeout);
   auto tf_rh4  = lookup_transform_("base_link", "rhleg4", stamp, timeout);
 
-  RCLCPP_INFO(rclcpp::get_logger("test"), "%lf, %lf, %lf",
-              tf_lf4.transform.translation.x, tf_lf4.transform.translation.y,
-              tf_lf4.transform.translation.z);
+  auto vec_lf4 = tfq_odom_base * vect_(tf_lf4);
+  auto vec_rf4 = tfq_odom_base * vect_(tf_rf4);
+  auto vec_lh4 = tfq_odom_base * vect_(tf_lh4);
+  auto vec_rh4 = tfq_odom_base * vect_(tf_rh4);
 
   auto tfmsg                    = tf2_msgs::msg::TFMessage();
   tfmsg.transforms              = {geometry_msgs::msg::TransformStamped()};
@@ -46,7 +47,8 @@ void quadruped_takahashi_odometry::callback_imu_(
   tfmsg.transforms.at(0).transform.translation = geometry_msgs::msg::Vector3();
   tfmsg.transforms.at(0).transform.translation.x = 0;
   tfmsg.transforms.at(0).transform.translation.y = 0;
-  tfmsg.transforms.at(0).transform.translation.z = 0;
+  tfmsg.transforms.at(0).transform.translation.z =
+      -std::min({vec_lf4.z(), vec_rf4.z(), vec_lh4.z(), vec_rh4.z()});
   tfmsg.transforms.at(0).transform.rotation = geometry_msgs::msg::Quaternion();
   tfmsg.transforms.at(0).transform.rotation.w = tfq_odom_base.w();
   tfmsg.transforms.at(0).transform.rotation.x = tfq_odom_base.x();
