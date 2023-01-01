@@ -10,6 +10,8 @@
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
   <depend>kondo_b3m_ros2</depend>
+  <depend>rt_usb_9axisimu_driver</depend>
+  <depend>imu_complementary_filter</depend>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

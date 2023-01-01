@@ -21,22 +21,26 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(tf2_msgs REQUIRED)
 
-add_executable(quadruped_takahashi
-  src/quadruped_takahashi.cpp
+add_executable(quadruped_takahashi_odometry
+  src/quadruped_takahashi_odometry.cpp
 )
-ament_target_dependencies(quadruped_takahashi
+ament_target_dependencies(quadruped_takahashi_odometry
   rclcpp
-  std_msgs
+  sensor_msgs
+  tf2_ros
+  tf2_msgs
 )
-target_include_directories(quadruped_takahashi PUBLIC
+target_include_directories(quadruped_takahashi_odometry PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
 install(TARGETS
-  quadruped_takahashi
+quadruped_takahashi_odometry
   DESTINATION lib/${PROJECT_NAME})
 
 install(
