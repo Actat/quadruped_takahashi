@@ -1,6 +1,7 @@
 #ifndef QUADRUPED_TAKAHASHI_ODOMETRY_HPP_
 #define QUADRUPED_TAKAHASHI_ODOMETRY_HPP_
 
+#include <chrono>
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
@@ -18,7 +19,13 @@ private:
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_imu_;
   rclcpp::Publisher<tf2_msgs::msg::TFMessage>::SharedPtr publisher_tf_;
 
-  void callback_imu_(const sensor_msgs::msg::Imu::SharedPtr msg);
+  void callback_imu_(sensor_msgs::msg::Imu::SharedPtr const msg);
+
+  geometry_msgs::msg::TransformStamped lookup_transform_(
+      std::string const target_frame,
+      std::string const source_frame,
+      builtin_interfaces::msg::Time const &time_stamp,
+      tf2::Duration const &timeout);
 };
 
 #endif  // QUADRUPED_TAKAHASHI_ODOMETRY_HPP_
