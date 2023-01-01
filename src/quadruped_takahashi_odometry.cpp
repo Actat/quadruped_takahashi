@@ -22,12 +22,37 @@ quadruped_takahashi_odometry::quadruped_takahashi_odometry()
 
 void quadruped_takahashi_odometry::callback_imu_(
     sensor_msgs::msg::Imu::SharedPtr const msg) {
+  auto tfq_odom_base =
+      Eigen::Quaterniond(0, 0, 1, 0) * quat_(msg) *
+      Eigen::Quaterniond(std::cos(-M_PI_4), 0, 0, std::sin(-M_PI_4));
+
   auto stamp   = msg->header.stamp;
   auto timeout = tf2::durationFromSec(1.0);
-  auto tf_lf4  = lookup_transform_("lfleg4", "base_link", stamp, timeout);
-  auto tf_rf4  = lookup_transform_("rfleg4", "base_link", stamp, timeout);
-  auto tf_lh4  = lookup_transform_("lhleg4", "base_link", stamp, timeout);
-  auto tf_rh4  = lookup_transform_("rhleg4", "base_link", stamp, timeout);
+  auto tf_lf4  = lookup_transform_("base_link", "lfleg4", stamp, timeout);
+  auto tf_rf4  = lookup_transform_("base_link", "rfleg4", stamp, timeout);
+  auto tf_lh4  = lookup_transform_("base_link", "lhleg4", stamp, timeout);
+  auto tf_rh4  = lookup_transform_("base_link", "rhleg4", stamp, timeout);
+
+  RCLCPP_INFO(rclcpp::get_logger("test"), "%lf, %lf, %lf",
+              tf_lf4.transform.translation.x, tf_lf4.transform.translation.y,
+              tf_lf4.transform.translation.z);
+
+  auto tfmsg                    = tf2_msgs::msg::TFMessage();
+  tfmsg.transforms              = {geometry_msgs::msg::TransformStamped()};
+  tfmsg.transforms.at(0).header = msg->header;
+  tfmsg.transforms.at(0).header.frame_id = "odom";
+  tfmsg.transforms.at(0).child_frame_id  = "base_link";
+  tfmsg.transforms.at(0).transform       = geometry_msgs::msg::Transform();
+  tfmsg.transforms.at(0).transform.translation = geometry_msgs::msg::Vector3();
+  tfmsg.transforms.at(0).transform.translation.x = 0;
+  tfmsg.transforms.at(0).transform.translation.y = 0;
+  tfmsg.transforms.at(0).transform.translation.z = 0;
+  tfmsg.transforms.at(0).transform.rotation = geometry_msgs::msg::Quaternion();
+  tfmsg.transforms.at(0).transform.rotation.w = tfq_odom_base.w();
+  tfmsg.transforms.at(0).transform.rotation.x = tfq_odom_base.x();
+  tfmsg.transforms.at(0).transform.rotation.y = tfq_odom_base.y();
+  tfmsg.transforms.at(0).transform.rotation.z = tfq_odom_base.z();
+  publisher_tf_->publish(tfmsg);
 }
 
 geometry_msgs::msg::TransformStamped
@@ -41,4 +66,22 @@ quadruped_takahashi_odometry::lookup_transform_(
       tf2::TimePoint(std::chrono::seconds(time_stamp.sec) +
                      std::chrono::nanoseconds(time_stamp.nanosec)),
       timeout);
+}
+
+Eigen::Quaterniond quadruped_takahashi_odometry::quat_(
+    geometry_msgs::msg::TransformStamped const &tf) {
+  return Eigen::Quaterniond(tf.transform.rotation.w, tf.transform.rotation.x,
+                            tf.transform.rotation.y, tf.transform.rotation.z);
+}
+
+Eigen::Quaterniond quadruped_takahashi_odometry::quat_(
+    sensor_msgs::msg::Imu::SharedPtr const msg) {
+  return Eigen::Quaterniond(msg->orientation.w, msg->orientation.x,
+                            msg->orientation.y, msg->orientation.z);
+}
+
+Eigen::Vector3d quadruped_takahashi_odometry::vect_(
+    geometry_msgs::msg::TransformStamped const &tf) {
+  return Eigen::Vector3d(tf.transform.translation.x, tf.transform.translation.y,
+                         tf.transform.translation.z);
 }

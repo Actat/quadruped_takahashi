@@ -2,6 +2,7 @@
 #define QUADRUPED_TAKAHASHI_ODOMETRY_HPP_
 
 #include <chrono>
+#include <eigen3/Eigen/Geometry>
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
@@ -26,6 +27,9 @@ private:
       std::string const source_frame,
       builtin_interfaces::msg::Time const &time_stamp,
       tf2::Duration const &timeout);
+  Eigen::Quaterniond quat_(geometry_msgs::msg::TransformStamped const &tf);
+  Eigen::Quaterniond quat_(sensor_msgs::msg::Imu::SharedPtr const msg);
+  Eigen::Vector3d vect_(geometry_msgs::msg::TransformStamped const &tf);
 };
 
 #endif  // QUADRUPED_TAKAHASHI_ODOMETRY_HPP_

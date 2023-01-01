@@ -121,6 +121,7 @@ def generate_launch_description():
     quadruped_takahashi_odometry = Node(
         package='quadruped_takahashi',
         executable='quadruped_takahashi_odometry',
+        remappings=[('~/tf', 'tf')],
     )
 
     ld = LaunchDescription()
