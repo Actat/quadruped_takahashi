@@ -59,6 +59,45 @@ def generate_launch_description():
         arguments=['-d', rviz_path]
     )
 
+    imu_node = LifecycleNode(
+        package='rt_usb_9axisimu_driver',
+        executable='rt_usb_9axisimu_driver',
+        name='rt_usb_9axisimu',
+        parameters=[{
+            'port': '/dev/ttyACM0'
+        }]
+    )
+    imu_inactive_to_active = RegisterEventHandler(
+        OnStateTransition(
+            target_lifecycle_node=imu_node,
+            goal_state='inactive',
+            entities=[
+                EmitEvent(
+                    event=ChangeState(
+                        lifecycle_node_matcher=launch.events.matches_action(
+                            imu_node),
+                        transition_id=lifecycle_msgs.msg.Transition.TRANSITION_ACTIVATE,
+                    )
+                )]
+        )
+    )
+    imu_configure = EmitEvent(
+        event=ChangeState(
+            lifecycle_node_matcher=launch.events.matches_action(imu_node),
+            transition_id=lifecycle_msgs.msg.Transition.TRANSITION_CONFIGURE,
+        )
+    )
+
+    imu_complementary_filter_node = Node(
+        package='imu_complementary_filter',
+        executable='complementary_filter_node',
+        name='imu_complementary_filter',
+        parameters=[{
+            'use_mag': True,
+            'publish_tf': True,
+        }]
+    )
+
     kondo_b3m_ros2_node = Node(
         package='kondo_b3m_ros2',
         executable='kondo_b3m',
@@ -82,6 +121,10 @@ def generate_launch_description():
     ld = LaunchDescription()
     ld.add_action(robot_state_publisher_node)
     ld.add_action(static_transform_publisher_node)
+    ld.add_action(imu_inactive_to_active)
+    ld.add_action(imu_node)
+    ld.add_action(imu_configure)
+    ld.add_action(imu_complementary_filter_node)
     ld.add_action(rviz_node)
     ld.add_action(kondo_b3m_ros2_node)
 
