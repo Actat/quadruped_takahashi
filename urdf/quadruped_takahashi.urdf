@@ -16,6 +16,14 @@
         <color rgba="0 0 1 1"/>
     </material>
 
+    <material name="green">
+        <color rgba="0 1 0 1"/>
+    </material>
+
+    <material name="red">
+        <color rgba="1 0 0 1"/>
+    </material>
+
     <link name="base_link">
         <visual>
             <geometry>
@@ -36,15 +44,7 @@
         </visual>
     </link>
 
-    <link name="lfleg1">
-        <visual>
-            <geometry>
-                <sphere radius="0.01"/>
-            </geometry>
-            <origin xyz="0 0 0"/>
-            <material name="blue"/>
-        </visual>
-    </link>
+    <link name="lfleg1"></link>
 
     <link name="lfleg2">
         <visual>
@@ -52,7 +52,7 @@
                 <box size="0.036 0.0545 0.1"/>
             </geometry>
             <origin xyz="-0.002 0.0057 -0.05"/>
-            <material name="white"/>
+            <material name="red"/>
         </visual>
     </link>
 
@@ -85,15 +85,7 @@
         </visual>
     </link>
 
-    <link name="rfleg1">
-        <visual>
-            <geometry>
-                <sphere radius="0.01"/>
-            </geometry>
-            <origin xyz="0 0 0"/>
-            <material name="blue"/>
-        </visual>
-    </link>
+    <link name="rfleg1"></link>
 
     <link name="rfleg2">
         <visual>
@@ -101,7 +93,7 @@
                 <box size="0.036 0.0545 0.1"/>
             </geometry>
             <origin xyz="-0.002 -0.0057 -0.05"/>
-            <material name="white"/>
+            <material name="green"/>
         </visual>
     </link>
 
@@ -134,15 +126,7 @@
         </visual>
     </link>
 
-    <link name="lhleg1">
-        <visual>
-            <geometry>
-                <sphere radius="0.01"/>
-            </geometry>
-            <origin xyz="0 0 0"/>
-            <material name="blue"/>
-        </visual>
-    </link>
+    <link name="lhleg1"></link>
 
     <link name="lhleg2">
         <visual>
@@ -183,15 +167,7 @@
         </visual>
     </link>
 
-    <link name="rhleg1">
-        <visual>
-            <geometry>
-                <sphere radius="0.01"/>
-            </geometry>
-            <origin xyz="0 0 0"/>
-            <material name="blue"/>
-        </visual>
-    </link>
+    <link name="rhleg1"></link>
 
     <link name="rhleg2">
         <visual>

@@ -190,4 +190,16 @@
     \label{fig:urdf_rviz_screen}
   \end{figure*}
 
+  \section{IMUのデータを読み取る}
+
+  胴体中央下部に株式会社アールティのUSB出力9軸IMUセンサモジュールが搭載されている．
+  rt-net/rt\_usb\_9axisimu\_driverによってrosのtopic（/imu/data\_rawと/imu/mag）にデータをパブリッシュする．
+  パブリッシュされたデータはCCNYRoboticsLab/imu\_toolsのimu\_complementary\_filterで姿勢の情報にする．
+  使用するパッケージをpackage.xmlに追記し，launchファイルにノードを起動する記述を追加した．
+
+  \texttt{odom}から\texttt{base\_link}への\texttt{tf}をパブリッシュする
+  \texttt{quadruped\_takahashi\_odometry}というノードを作る．
+  \texttt{/imu/data}をサブスクライブし，更新が入ったらコールバックで足の情報を参照して\texttt{tf}に情報を出す．
+  ひとまず$xy$平面内での位置はゼロに固定し，高さは最も低い位置にある足が接地しているものとする．
+
 \end{document}
