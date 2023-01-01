@@ -118,6 +118,11 @@ def generate_launch_description():
         ]}],
     )
 
+    quadruped_takahashi_odometry = Node(
+        package='quadruped_takahashi',
+        executable='quadruped_takahashi_odometry',
+    )
+
     ld = LaunchDescription()
     ld.add_action(robot_state_publisher_node)
     ld.add_action(static_transform_publisher_node)
@@ -127,5 +132,6 @@ def generate_launch_description():
     ld.add_action(imu_complementary_filter_node)
     ld.add_action(rviz_node)
     ld.add_action(kondo_b3m_ros2_node)
+    ld.add_action(quadruped_takahashi_odometry)
 
     return ld
