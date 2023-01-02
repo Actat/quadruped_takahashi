@@ -308,5 +308,88 @@
 
   最後に$\theta_\mathrm{xx1}$を求める．
   $x$と$y^2+z^2$の式変形により，$\sin\theta_\mathrm{xx1}, \cos\theta_\mathrm{xx1}$の関係式を得る．
+  \begin{align*}
+    x &= -l_\mathrm{t}\sin{\theta_\mathrm{xx1}} - l_\mathrm{s}\sin{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)} \\
+    &= -l_\mathrm{t}\sin{\theta_\mathrm{xx1}}
+    - l_\mathrm{s}\left(\sin\theta_\mathrm{xx1}\cos\theta_\mathrm{xx2} + \cos\theta_\mathrm{xx1}\sin\theta_\mathrm{xx2}\right) \\
+    &= \left(- l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)\cos\theta_\mathrm{xx1}
+    + \left(-l_\mathrm{t}- l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)\sin{\theta_\mathrm{xx1}}
+  \end{align*}
+  \begin{align*}
+    y^2+z^2 &= \left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)^2 \\
+    &= \left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}}
+    + l_\mathrm{s}\left(\cos\theta_\mathrm{xx1}\cos\theta_\mathrm{xx2} - \sin\theta_\mathrm{xx1}\sin\theta_\mathrm{xx2}\right)\right)^2 \\
+    &= \left(\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)\cos\theta_\mathrm{xx1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)\sin\theta_\mathrm{xx1}\right)^2
+  \end{align*}
+  値の範囲を確認する．
+  前脚の場合$-1.570796326 \leq \theta_\mathrm{xf1} \leq 0, 0 \leq \theta_\mathrm{xf2} \leq 2.801777048$なので，
+  $0 \leq \cos\theta_\mathrm{xf1} \leq 1, -1 \leq \sin\theta_\mathrm{xf1} \leq 0,
+  -1 < \cos\theta_\mathrm{xf2} \leq 1, 0 \leq \sin\theta_\mathrm{xf2} \leq 1$である．
+  今，$l_\mathrm{t} = l_\mathrm{s}$なので
+  $\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xf2}\right)\cos\theta_\mathrm{xf1} \geq 0,
+  \left(- l_\mathrm{s}\sin\theta_\mathrm{xf2}\right)\sin\theta_\mathrm{xf1} \geq 0$だから
+  \[
+    \sqrt{y^2+z^2} = \left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xf2}\right)\cos\theta_\mathrm{xf1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xf2}\right)\sin\theta_\mathrm{xf1}
+  \]
+  である．
+  後脚の場合$0 \leq \theta_\mathrm{xh1} \leq 1.570796326, -2.801777048 \leq \theta_\mathrm{xh2} \leq 0$なので，
+  $0 \leq \cos\theta_\mathrm{xh1} \leq 1, 0 \leq \sin\theta_\mathrm{xh1} \leq 1,
+  -1 < \cos\theta_\mathrm{xh2} \leq 1, -1 \leq \sin\theta_\mathrm{xh2} \leq 0$である．
+  $l_\mathrm{t} = l_\mathrm{s}$だから
+  $\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xh2}\right)\cos\theta_\mathrm{xh1} \geq 0,
+  \left(- l_\mathrm{s}\sin\theta_\mathrm{xh2}\right)\sin\theta_\mathrm{xh1} \geq 0$なので
+  \[
+    \sqrt{y^2+z^2} = \left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xh2}\right)\cos\theta_\mathrm{xh1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xh2}\right)\sin\theta_\mathrm{xh1}
+  \]
+  である．結局前脚でも後脚でも
+  \[
+    \sqrt{y^2+z^2} = \left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)\cos\theta_\mathrm{xx1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)\sin\theta_\mathrm{xx1}
+  \]
+  である．
+  これで$\sin\theta_\mathrm{xx1}, \cos\theta_\mathrm{xx1}$の1次式を2つ得られたので，連立して値を求められる．
+  \begin{align*}
+    \begin{bmatrix} x \\ \sqrt{y^2 + z^2} \end{bmatrix} &=
+    \begin{bmatrix}
+      - l_\mathrm{s}\sin\theta_\mathrm{xx2} & -l_\mathrm{t}- l_\mathrm{s}\cos\theta_\mathrm{xx2} \\
+      l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2} & - l_\mathrm{s}\sin\theta_\mathrm{xx2}
+    \end{bmatrix}
+    \begin{bmatrix} \cos\theta_\mathrm{xx1} \\ \sin\theta_\mathrm{xx1} \end{bmatrix} \\
+    \begin{bmatrix} \cos\theta_\mathrm{xx1} \\ \sin\theta_\mathrm{xx1} \end{bmatrix}
+    &= \frac{1}{l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}}
+    \begin{bmatrix}
+      - l_\mathrm{s}\sin\theta_\mathrm{xx2} & l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2} \\
+      -l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2} & - l_\mathrm{s}\sin\theta_\mathrm{xx2}
+    \end{bmatrix}
+    \begin{bmatrix} x \\ \sqrt{y^2 + z^2} \end{bmatrix} \\
+    \tan\theta_\mathrm{xx1} &= \frac{\sin\theta_\mathrm{xx1}}{\cos\theta_\mathrm{xx1}} \\
+    &= \frac{x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)}
+    {x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)} \\
+    \theta_\mathrm{xx1} &= \arctan\left(
+      \frac{x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)}
+      {x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)}
+    \right)
+  \end{align*}
+
+  以上まとめると\texttt{base\_link}からみた各足の位置を表すベクトル$\boldsymbol{r}_\mathrm{xx4}^\mathrm{base}$から関節角を以下の手順で求められる．
+  \begin{itemize}
+    \item 脚の付け根の位置ベクトル$\boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$を引いて
+    $[x\, y\, z]^T = \boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$とする．
+    \item $\theta_\mathrm{xx0} = \begin{cases}
+      0 & z = 0\text{のとき} \\
+      \arctan{\left(-\frac{y}{z}\right)} & z\neq 0\text{のとき}
+    \end{cases}$
+    \item $\theta_\mathrm{xx2} = \begin{cases}
+      \arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{前脚の場合} \\
+      -\arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{後脚の場合}
+    \end{cases}$
+    \item $\theta_\mathrm{xx1} = \mathrm{atan2}\left(
+      x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right),
+      x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)
+    \right)$
+  \end{itemize}
 
 \end{document}
