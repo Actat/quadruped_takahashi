@@ -202,4 +202,200 @@
   \texttt{/imu/data}をサブスクライブし，更新が入ったらコールバックで足の情報を参照して\texttt{tf}に情報を出す．
   ひとまず$xy$平面内での位置はゼロに固定し，高さは最も低い位置にある足が接地しているものとする．
 
+  \section{脚の逆運動学}
+
+  \texttt{base\_link}における足の位置を指令して各モータを追従させるために逆運動学計算を実装する．
+  初めに，各関節がとれる値の範囲を表\ref{table:range_joint_angle}のとおりに定める．
+
+  \begin{table}[htb]
+    \caption{関節角の範囲}
+    \label{table:range_joint_angle}
+    \centering
+    \begin{tabular}{rcccccc}
+      \hline
+      id & 脚 & 関節 & \multicolumn{2}{c}{最小値} & \multicolumn{2}{c}{最大値} \\
+       &  &  & deg & rad & deg & rad \\
+      \hline
+      0 & 左前 & Hip ab/adduction & -10 & -0.174532925 & 45 & 0.785398163 \\
+      1 & 左前 & Hip flexion/extension & -90 & -1.570796326 & 0 & 0 \\
+      2 & 左前 & knee & 0 & 0 & 160.53 & 2.801777048 \\
+      3 & 右前 & Hip ab/adduction & -45 & -0.785398163 & 10 & 0.174532925 \\
+      4 & 右前 & Hip flexion/extension & -90 & -1.570796326 & 0 & 0 \\
+      5 & 右前 & knee & 0 & 0 & 160.53 & 2.801777048 \\
+      6 & 左後 & Hip ab/adduction & -10 & -0.174532925 & 45 & 0.785398163 \\
+      7 & 左後 & Hip flexion/extension & 0 & 0 & 90 & 1.570796326 \\
+      8 & 左後 & knee & -160.53 & -2.801777048 & 0 & 0 \\
+      9 & 右後 & Hip ab/adduction & -45 & -0.785398163 & 10 & 0.174532925 \\
+      10 & 右後 & Hip flexion/extension & 0 & 0 & 90 & 1.570796326 \\
+      11 & 右後 & knee & -160.53 & -2.801777048 & 0 & 0 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+  初めに順運動学を考え，\texttt{base\_link}からみた各足の位置を表す
+  ベクトル  $\boldsymbol{r}_\mathrm{xx4}^\mathrm{base}$を
+  関節角$\theta_\mathrm{xx0}, \theta_\mathrm{xx1}, \theta_\mathrm{xx2}$を用いて表す．
+  ここではxxは左前脚・右前脚・左後脚・右後脚に合わせてlf, rf, lh, rhが入るものとする．
+  \texttt{base\_link}からみた脚の付け根の位置を表すベクトルを
+  $\boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$，
+  腿と脛の長さを$l_\mathrm{t}, l_\mathrm{s}$とすると以下のようになる．
+  \[
+    \boldsymbol{r}_\mathrm{xx4}^\mathrm{base} = \boldsymbol{r}^\mathrm{base}_\mathrm{xx0} + \begin{bmatrix}
+      -l_\mathrm{t}\sin{\theta_\mathrm{xx1}} - l_\mathrm{s}\sin{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)} \\
+      \sin\theta_\mathrm{xx0}\left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right) \\
+      -\cos\theta_\mathrm{xx0}\left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right) \\
+    \end{bmatrix}
+  \]
+
+  ここからは逆運動学を考える．
+  脚の付け根の位置ベクトル$\boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$は定数なので最初にこれを引いて
+  $\boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0} = [x\, y\, z]^T$とする．
+
+  初めに$y, z$のみで定まる$\theta_\mathrm{xx0}$を求める．
+  $z\neq 0$の場合は以下の通り，$\arctan$で求められる．
+  \begin{gather*}
+    \left\{
+    \begin{array}{l}
+        y = \sin\theta_\mathrm{xx0}\left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right) \\
+        z = -\cos\theta_\mathrm{xx0}\left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)
+      \end{array}
+    \right. \\
+    -\frac{y}{z} = \tan\theta_\mathrm{xx0} \\
+    \theta_\mathrm{xx0} = \arctan{\left(-\frac{y}{z}\right)}
+  \end{gather*}
+
+  $z = 0$の場合，図\ref{fig:fig_ik_z0}に示すように$\theta_\mathrm{xx0}$は任意の値をとれる．
+  便宜上，この場合は$\theta_\mathrm{xx0}=0$に定めることにする．
+
+  \[
+    \theta_\mathrm{xx0} = \begin{cases}
+      0 & z = 0\text{のとき} \\
+      \arctan{\left(-\frac{y}{z}\right)} & z\neq 0\text{のとき}
+    \end{cases}
+  \]
+
+  \begin{figure*}[htb]
+    \centering
+    \input{fig_ik_z0.pdf_tex}
+    \caption{
+      $z = 0$の場合，$\theta_\mathrm{xx0}$は任意の値をとれる．
+    }
+    \label{fig:fig_ik_z0}
+  \end{figure*}
+
+  次に脚の長さに注目して膝関節の角度$\theta_\mathrm{xx2}$を求める．
+  \begin{align*}
+    x^2 + y^2 + z^2 &= \left|\boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0}\right|^2 \\
+    &= \left(-l_\mathrm{t}\sin{\theta_\mathrm{xx1}} - l_\mathrm{s}\sin{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)^2 \\
+    &\quad + \left(\sin\theta_\mathrm{xx0}\left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)\right)^2 \\
+    &\quad + \left(-\cos\theta_\mathrm{xx0}\left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)\right)^2 \\
+    &= \left(-l_\mathrm{t}\sin{\theta_\mathrm{xx1}} - l_\mathrm{s}\sin{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)^2 \\
+    &\quad + \left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)^2 \\
+    &= l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\left(
+      \sin{\theta_\mathrm{xx1}}\sin{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}
+      + \cos{\theta_\mathrm{xx1}}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)
+     + l_\mathrm{s}^2 \\
+    &= l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos{\theta_\mathrm{xx2}} + l_\mathrm{s}^2 \\
+    \cos{\theta_\mathrm{xx2}} &= \frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}
+  \end{align*}
+  膝関節の値域は前脚の場合$0 \leq \theta_\mathrm{xf2} \leq 2.801777048$，後脚の場合$-2.801777048 \leq \theta_\mathrm{xh2} \leq 0$であることに注意する．
+  \[
+    \theta_\mathrm{xx2} = \begin{cases}
+      \arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{前脚の場合} \\
+      -\arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{後脚の場合}
+    \end{cases}
+  \]
+
+  最後に$\theta_\mathrm{xx1}$を求める．
+  $x$と$y^2+z^2$の式変形により，$\sin\theta_\mathrm{xx1}, \cos\theta_\mathrm{xx1}$の関係式を得る．
+  \begin{align*}
+    x &= -l_\mathrm{t}\sin{\theta_\mathrm{xx1}} - l_\mathrm{s}\sin{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)} \\
+    &= -l_\mathrm{t}\sin{\theta_\mathrm{xx1}}
+    - l_\mathrm{s}\left(\sin\theta_\mathrm{xx1}\cos\theta_\mathrm{xx2} + \cos\theta_\mathrm{xx1}\sin\theta_\mathrm{xx2}\right) \\
+    &= \left(- l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)\cos\theta_\mathrm{xx1}
+    + \left(-l_\mathrm{t}- l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)\sin{\theta_\mathrm{xx1}}
+  \end{align*}
+  \begin{align*}
+    y^2+z^2 &= \left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}} + l_\mathrm{s}\cos{\left(\theta_\mathrm{xx1}+\theta_\mathrm{xx2}\right)}\right)^2 \\
+    &= \left(l_\mathrm{t}\cos{\theta_\mathrm{xx1}}
+    + l_\mathrm{s}\left(\cos\theta_\mathrm{xx1}\cos\theta_\mathrm{xx2} - \sin\theta_\mathrm{xx1}\sin\theta_\mathrm{xx2}\right)\right)^2 \\
+    &= \left(\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)\cos\theta_\mathrm{xx1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)\sin\theta_\mathrm{xx1}\right)^2
+  \end{align*}
+  値の範囲を確認する．
+  前脚の場合$-1.570796326 \leq \theta_\mathrm{xf1} \leq 0, 0 \leq \theta_\mathrm{xf2} \leq 2.801777048$なので，
+  $0 \leq \cos\theta_\mathrm{xf1} \leq 1, -1 \leq \sin\theta_\mathrm{xf1} \leq 0,
+  -1 < \cos\theta_\mathrm{xf2} \leq 1, 0 \leq \sin\theta_\mathrm{xf2} \leq 1$である．
+  今，$l_\mathrm{t} = l_\mathrm{s}$なので
+  $\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xf2}\right)\cos\theta_\mathrm{xf1} \geq 0,
+  \left(- l_\mathrm{s}\sin\theta_\mathrm{xf2}\right)\sin\theta_\mathrm{xf1} \geq 0$だから
+  \[
+    \sqrt{y^2+z^2} = \left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xf2}\right)\cos\theta_\mathrm{xf1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xf2}\right)\sin\theta_\mathrm{xf1}
+  \]
+  である．
+  後脚の場合$0 \leq \theta_\mathrm{xh1} \leq 1.570796326, -2.801777048 \leq \theta_\mathrm{xh2} \leq 0$なので，
+  $0 \leq \cos\theta_\mathrm{xh1} \leq 1, 0 \leq \sin\theta_\mathrm{xh1} \leq 1,
+  -1 < \cos\theta_\mathrm{xh2} \leq 1, -1 \leq \sin\theta_\mathrm{xh2} \leq 0$である．
+  $l_\mathrm{t} = l_\mathrm{s}$だから
+  $\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xh2}\right)\cos\theta_\mathrm{xh1} \geq 0,
+  \left(- l_\mathrm{s}\sin\theta_\mathrm{xh2}\right)\sin\theta_\mathrm{xh1} \geq 0$なので
+  \[
+    \sqrt{y^2+z^2} = \left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xh2}\right)\cos\theta_\mathrm{xh1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xh2}\right)\sin\theta_\mathrm{xh1}
+  \]
+  である．結局前脚でも後脚でも
+  \[
+    \sqrt{y^2+z^2} = \left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)\cos\theta_\mathrm{xx1}
+    + \left(- l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)\sin\theta_\mathrm{xx1}
+  \]
+  である．
+  これで$\sin\theta_\mathrm{xx1}, \cos\theta_\mathrm{xx1}$の1次式を2つ得られたので，連立して値を求められる．
+  \begin{align*}
+    \begin{bmatrix} x \\ \sqrt{y^2 + z^2} \end{bmatrix} &=
+    \begin{bmatrix}
+      - l_\mathrm{s}\sin\theta_\mathrm{xx2} & -l_\mathrm{t}- l_\mathrm{s}\cos\theta_\mathrm{xx2} \\
+      l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2} & - l_\mathrm{s}\sin\theta_\mathrm{xx2}
+    \end{bmatrix}
+    \begin{bmatrix} \cos\theta_\mathrm{xx1} \\ \sin\theta_\mathrm{xx1} \end{bmatrix} \\
+    \begin{bmatrix} \cos\theta_\mathrm{xx1} \\ \sin\theta_\mathrm{xx1} \end{bmatrix}
+    &= \frac{1}{l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}^2}
+    \begin{bmatrix}
+      - l_\mathrm{s}\sin\theta_\mathrm{xx2} & l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2} \\
+      -l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2} & - l_\mathrm{s}\sin\theta_\mathrm{xx2}
+    \end{bmatrix}
+    \begin{bmatrix} x \\ \sqrt{y^2 + z^2} \end{bmatrix} \\
+    \tan\theta_\mathrm{xx1} &= \frac{\sin\theta_\mathrm{xx1}}{\cos\theta_\mathrm{xx1}} \\
+    &= \frac{x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)}
+    {x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)} \\
+    \theta_\mathrm{xx1} &= \arctan\left(
+      \frac{x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)}
+      {x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)}
+    \right)
+  \end{align*}
+
+  以上まとめると\texttt{base\_link}からみた各足の位置を表すベクトル$\boldsymbol{r}_\mathrm{xx4}^\mathrm{base}$から関節角を以下の手順で求められる．
+  \begin{itemize}
+    \item 脚の付け根の位置ベクトル$\boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$を引いて
+    $[x\, y\, z]^T = \boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$とする．
+    \item $\theta_\mathrm{xx0} = \mathrm{atan2}\left(y, -z\right)$
+    \item $\theta_\mathrm{xx2} = \begin{cases}
+      \arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{前脚の場合} \\
+      -\arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{後脚の場合}
+    \end{cases}$
+    \item $\theta_\mathrm{xx1} = \mathrm{atan2}\left(
+      \frac{x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)}
+      {l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}^2},
+      \frac{x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)}
+      {l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}^2}
+    \right)$
+  \end{itemize}
+
+  逆運動学計算を実装する．
+  脚の付け根の関節角$\theta_\mathrm{xx0}, \theta_\mathrm{xx1}$は$\mathrm{atan2}$であり，引数両方がゼロの時にエラーになる可能性がある．
+  $\theta_\mathrm{xx0}$で引数両方がゼロになるのは$y = z = 0$のときで，この時は$\theta_\mathrm{xx0} = 0$とすることに決めていた．
+  $\theta_\mathrm{xx1}$は$\theta_\mathrm{xx1} = \pi$になって脚の長さがゼロにならない限り問題は起こらない．
+  $\theta_\mathrm{xx2}$は$\boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$の長さによって定義域を外れる．
+  脚の長さが長すぎるときは最大限に伸展した状態になるように例外処理を入れる．
+
 \end{document}
