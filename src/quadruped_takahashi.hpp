@@ -4,6 +4,10 @@
 #include <array>
 #include <chrono>
 #include <eigen3/Eigen/Geometry>
+#include "kondo_b3m_ros2/srv/desired_position.hpp"
+#include "kondo_b3m_ros2/srv/motor_free.hpp"
+#include "kondo_b3m_ros2/srv/start_position_control.hpp"
+#include "quadruped_takahashi/srv/mode.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
@@ -15,7 +19,7 @@ public:
   double const length_t            = 0.1;
   double const length_s            = 0.1;
   double const foot_radius         = 0.01;
-  double const stand_hight         = 0.10;
+  double const stand_hight         = 0.15;
   Eigen::Vector3d const r_base_lf0 = Eigen::Vector3d(0.076, 0.04, 0);
   Eigen::Vector3d const r_base_rf0 = Eigen::Vector3d(0.076, -0.04, 0);
   Eigen::Vector3d const r_base_lh0 = Eigen::Vector3d(-0.076, 0.04, 0);
@@ -24,14 +28,32 @@ public:
   quadruped_takahashi_node();
 
 private:
+  std::chrono::duration<int, std::milli> const control_period_ =
+      std::chrono::duration<int, std::milli>(10);
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
+  rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_imu_;
   rclcpp::Publisher<tf2_msgs::msg::TFMessage>::SharedPtr publisher_tf_;
+  rclcpp::Service<quadruped_takahashi::srv::Mode>::SharedPtr service_mode_;
+
+  rclcpp::Client<kondo_b3m_ros2::srv::MotorFree>::SharedPtr client_b3m_mf_;
+  rclcpp::Client<kondo_b3m_ros2::srv::StartPositionControl>::SharedPtr
+      client_b3m_spc_;
+  rclcpp::Client<kondo_b3m_ros2::srv::DesiredPosition>::SharedPtr
+      client_b3m_dp_;
 
   void callback_imu_(sensor_msgs::msg::Imu::SharedPtr const msg);
-
+  void callback_mode_(
+      std::shared_ptr<quadruped_takahashi::srv::Mode::Request> const request,
+      std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response);
+  void mode_motor_free_(
+      std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response);
+  void mode_start_position_control_(
+      std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response);
+  void mode_stand_(
+      std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response);
   void timer_callback_stand_();
 
   std::array<double, 3> ik_lf_(Eigen::Vector3d const &r_base_lf4);
