@@ -1,26 +1,25 @@
-#include "quadruped_takahashi_odometry.hpp"
+#include "quadruped_takahashi.hpp"
 
 int main(int argc, char *argv[]) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<quadruped_takahashi_odometry>());
+  rclcpp::spin(std::make_shared<quadruped_takahashi>());
   rclcpp::shutdown();
   return 0;
 }
 
-quadruped_takahashi_odometry::quadruped_takahashi_odometry()
-    : Node("quadruped_takahashi_odometry") {
+quadruped_takahashi::quadruped_takahashi() : Node("quadruped_takahashi") {
   tf_buffer_   = std::make_unique<tf2_ros::Buffer>(this->get_clock());
   tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
   subscription_imu_ = this->create_subscription<sensor_msgs::msg::Imu>(
       "/imu/data", 10,
-      std::bind(&quadruped_takahashi_odometry::callback_imu_, this,
+      std::bind(&quadruped_takahashi::callback_imu_, this,
                 std::placeholders::_1));
   publisher_tf_ =
       this->create_publisher<tf2_msgs::msg::TFMessage>("~/tf", rclcpp::QoS(10));
 }
 
-void quadruped_takahashi_odometry::callback_imu_(
+void quadruped_takahashi::callback_imu_(
     sensor_msgs::msg::Imu::SharedPtr const msg) {
   auto tfq_odom_base =
       Eigen::Quaterniond(0, 0, 1, 0) * quat_(msg) *
@@ -61,8 +60,7 @@ void quadruped_takahashi_odometry::callback_imu_(
   publisher_tf_->publish(tfmsg);
 }
 
-geometry_msgs::msg::TransformStamped
-quadruped_takahashi_odometry::lookup_transform_(
+geometry_msgs::msg::TransformStamped quadruped_takahashi::lookup_transform_(
     std::string const target_frame,
     std::string const source_frame,
     builtin_interfaces::msg::Time const &time_stamp,
@@ -74,19 +72,19 @@ quadruped_takahashi_odometry::lookup_transform_(
       timeout);
 }
 
-Eigen::Quaterniond quadruped_takahashi_odometry::quat_(
+Eigen::Quaterniond quadruped_takahashi::quat_(
     geometry_msgs::msg::TransformStamped const &tf) {
   return Eigen::Quaterniond(tf.transform.rotation.w, tf.transform.rotation.x,
                             tf.transform.rotation.y, tf.transform.rotation.z);
 }
 
-Eigen::Quaterniond quadruped_takahashi_odometry::quat_(
+Eigen::Quaterniond quadruped_takahashi::quat_(
     sensor_msgs::msg::Imu::SharedPtr const msg) {
   return Eigen::Quaterniond(msg->orientation.w, msg->orientation.x,
                             msg->orientation.y, msg->orientation.z);
 }
 
-Eigen::Vector3d quadruped_takahashi_odometry::vect_(
+Eigen::Vector3d quadruped_takahashi::vect_(
     geometry_msgs::msg::TransformStamped const &tf) {
   return Eigen::Vector3d(tf.transform.translation.x, tf.transform.translation.y,
                          tf.transform.translation.z);

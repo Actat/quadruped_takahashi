@@ -1,5 +1,5 @@
-#ifndef QUADRUPED_TAKAHASHI_ODOMETRY_HPP_
-#define QUADRUPED_TAKAHASHI_ODOMETRY_HPP_
+#ifndef QUADRUPED_TAKAHASHI_HPP_
+#define QUADRUPED_TAKAHASHI_HPP_
 
 #include <chrono>
 #include <eigen3/Eigen/Geometry>
@@ -9,9 +9,9 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 
-class quadruped_takahashi_odometry : public rclcpp::Node {
+class quadruped_takahashi : public rclcpp::Node {
 public:
-  quadruped_takahashi_odometry();
+  quadruped_takahashi();
 
 private:
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
@@ -32,4 +32,4 @@ private:
   Eigen::Vector3d vect_(geometry_msgs::msg::TransformStamped const &tf);
 };
 
-#endif  // QUADRUPED_TAKAHASHI_ODOMETRY_HPP_
+#endif  // QUADRUPED_TAKAHASHI_HPP_
