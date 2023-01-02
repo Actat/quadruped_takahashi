@@ -1,6 +1,7 @@
 #ifndef QUADRUPED_TAKAHASHI_HPP_
 #define QUADRUPED_TAKAHASHI_HPP_
 
+#include <array>
 #include <chrono>
 #include <eigen3/Eigen/Geometry>
 #include "rclcpp/rclcpp.hpp"
@@ -31,6 +32,15 @@ private:
 
   void callback_imu_(sensor_msgs::msg::Imu::SharedPtr const msg);
 
+  void timer_callback_stand_();
+
+  std::array<double, 3> ik_lf_(Eigen::Vector3d const &r_base_lf4);
+  std::array<double, 3> ik_rf_(Eigen::Vector3d const &r_base_rf4);
+  std::array<double, 3> ik_lh_(Eigen::Vector3d const &r_base_lh4);
+  std::array<double, 3> ik_rh_(Eigen::Vector3d const &r_base_rh4);
+  std::array<double, 3> ik_xf_(Eigen::Vector3d const &r_xf0_rf4);
+  std::array<double, 3> ik_xh_(Eigen::Vector3d const &r_xh0_lh4);
+
   geometry_msgs::msg::TransformStamped lookup_transform_(
       std::string const target_frame,
       std::string const source_frame,
@@ -39,6 +49,8 @@ private:
   Eigen::Quaterniond quat_(geometry_msgs::msg::TransformStamped const &tf);
   Eigen::Quaterniond quat_(sensor_msgs::msg::Imu::SharedPtr const msg);
   Eigen::Vector3d vect_(geometry_msgs::msg::TransformStamped const &tf);
+
+  double clamp_(double value, double low, double high);
 };
 
 #endif  // QUADRUPED_TAKAHASHI_HPP_

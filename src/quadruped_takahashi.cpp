@@ -59,6 +59,111 @@ void quadruped_takahashi::callback_imu_(
   publisher_tf_->publish(tfmsg);
 }
 
+void quadruped_takahashi::timer_callback_stand_() {
+  auto ar_lf =
+      ik_lf_(r_base_lf0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+  auto ar_rf =
+      ik_rf_(r_base_rf0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+  auto ar_lh =
+      ik_lh_(r_base_lh0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+  auto ar_rh =
+      ik_rh_(r_base_rh0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+
+  auto vec = std::vector<double>({ar_lf.at(0), ar_lf.at(1), ar_lf.at(2),  //
+                                  ar_rf.at(0), ar_rf.at(1), ar_rf.at(2),  //
+                                  ar_lh.at(0), ar_lh.at(1), ar_lh.at(2),  //
+                                  ar_rh.at(0), ar_rh.at(1), ar_rh.at(2)});
+}
+
+std::array<double, 3> quadruped_takahashi::ik_lf_(
+    Eigen::Vector3d const &r_base_lf4) {
+  auto r_lf0_lf4 = r_base_lf4 - r_base_lf0;
+  auto ar        = ik_xf_(r_lf0_lf4);
+  ar.at(0)       = clamp_(ar.at(0), -0.174532925, M_PI_4);
+  ar.at(1)       = clamp_(ar.at(1), -M_PI_2, 0);
+  ar.at(2)       = clamp_(ar.at(2), 0, 2.801777048);
+  return ar;
+}
+std::array<double, 3> quadruped_takahashi::ik_rf_(
+    Eigen::Vector3d const &r_base_rf4) {
+  auto r_rf0_rf4 = r_base_rf4 - r_base_rf0;
+  auto ar        = ik_xf_(r_rf0_rf4);
+  ar.at(0)       = clamp_(ar.at(0), -M_PI_4, 0.174532925);
+  ar.at(1)       = clamp_(ar.at(1), -M_PI_2, 0);
+  ar.at(2)       = clamp_(ar.at(2), 0, 2.801777048);
+  return ar;
+}
+std::array<double, 3> quadruped_takahashi::ik_lh_(
+    Eigen::Vector3d const &r_base_lh4) {
+  auto r_lh0_lh4 = r_base_lh4 - r_base_lh0;
+  auto ar        = ik_xh_(r_lh0_lh4);
+  ar.at(0)       = clamp_(ar.at(0), -0.174532925, M_PI_4);
+  ar.at(1)       = clamp_(ar.at(1), 0, M_PI_2);
+  ar.at(2)       = clamp_(ar.at(2), -2.801777048, 0);
+  return ar;
+}
+std::array<double, 3> quadruped_takahashi::ik_rh_(
+    Eigen::Vector3d const &r_base_rh4) {
+  auto r_rh0_rh4 = r_base_rh4 - r_base_rh0;
+  auto ar        = ik_xh_(r_rh0_rh4);
+  ar.at(0)       = clamp_(ar.at(0), -M_PI_4, 0.174532925);
+  ar.at(1)       = clamp_(ar.at(1), 0, M_PI_2);
+  ar.at(2)       = clamp_(ar.at(2), -2.801777048, 0);
+  return ar;
+}
+std::array<double, 3> quadruped_takahashi::ik_xf_(
+    Eigen::Vector3d const &r_xf0_xf4) {
+  auto r         = r_xf0_xf4.norm() <= length_t + length_s
+                       ? r_xf0_xf4
+                       : (length_t + length_s) * r_xf0_xf4.normalized();
+  double const x = r.x();
+  double const y = r.y();
+  double const z = r.z();
+
+  double theta_xx0 = y == 0 && z == 0 ? 0 : std::atan2(y, -z);
+  double theta_xx2 = std::acos(
+      (x * x + y * y + z * z - length_t * length_t - length_s * length_s) /
+      (2.0 * length_t * length_s));
+  double theta_xx1 = std::atan2(
+      (x * (-length_t - length_s * std::cos(theta_xx2)) +
+       std::sqrt(y * y + z * z) * (-length_s * std::sin(theta_xx2))) /
+          (length_t * length_t + 2 * length_t * length_s * std::cos(theta_xx2) +
+           length_s * length_s),
+      (x * (-length_s * std::sin(theta_xx2)) +
+       std::sqrt(y * y + z * z) * (length_t + length_s * std::cos(theta_xx2))) /
+          (length_t * length_t + 2 * length_t * length_s * std::cos(theta_xx2) +
+           length_s * length_s));
+
+  std::array<double, 3> ar = {theta_xx0, theta_xx1, theta_xx2};
+  return ar;
+}
+std::array<double, 3> quadruped_takahashi::ik_xh_(
+    Eigen::Vector3d const &r_xh0_xh4) {
+  auto r         = r_xh0_xh4.norm() <= length_t + length_s
+                       ? r_xh0_xh4
+                       : (length_t + length_s) * r_xh0_xh4.normalized();
+  double const x = r.x();
+  double const y = r.y();
+  double const z = r.z();
+
+  double theta_xx0 = y == 0 && z == 0 ? 0 : std::atan2(y, -z);
+  double theta_xx2 = -std::acos(
+      (x * x + y * y + z * z - length_t * length_t - length_s * length_s) /
+      (2.0 * length_t * length_s));
+  double theta_xx1 = std::atan2(
+      (x * (-length_t - length_s * std::cos(theta_xx2)) +
+       std::sqrt(y * y + z * z) * (-length_s * std::sin(theta_xx2))) /
+          (length_t * length_t + 2 * length_t * length_s * std::cos(theta_xx2) +
+           length_s * length_s),
+      (x * (-length_s * std::sin(theta_xx2)) +
+       std::sqrt(y * y + z * z) * (length_t + length_s * std::cos(theta_xx2))) /
+          (length_t * length_t + 2 * length_t * length_s * std::cos(theta_xx2) +
+           length_s * length_s));
+
+  std::array<double, 3> ar = {theta_xx0, theta_xx1, theta_xx2};
+  return ar;
+}
+
 geometry_msgs::msg::TransformStamped quadruped_takahashi::lookup_transform_(
     std::string const target_frame,
     std::string const source_frame,
@@ -87,4 +192,8 @@ Eigen::Vector3d quadruped_takahashi::vect_(
     geometry_msgs::msg::TransformStamped const &tf) {
   return Eigen::Vector3d(tf.transform.translation.x, tf.transform.translation.y,
                          tf.transform.translation.z);
+}
+
+double quadruped_takahashi::clamp_(double value, double low, double high) {
+  return std::min(std::max(value, low), high);
 }
