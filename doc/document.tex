@@ -359,7 +359,7 @@
     \end{bmatrix}
     \begin{bmatrix} \cos\theta_\mathrm{xx1} \\ \sin\theta_\mathrm{xx1} \end{bmatrix} \\
     \begin{bmatrix} \cos\theta_\mathrm{xx1} \\ \sin\theta_\mathrm{xx1} \end{bmatrix}
-    &= \frac{1}{l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}}
+    &= \frac{1}{l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}^2}
     \begin{bmatrix}
       - l_\mathrm{s}\sin\theta_\mathrm{xx2} & l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2} \\
       -l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2} & - l_\mathrm{s}\sin\theta_\mathrm{xx2}
@@ -378,18 +378,24 @@
   \begin{itemize}
     \item 脚の付け根の位置ベクトル$\boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$を引いて
     $[x\, y\, z]^T = \boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$とする．
-    \item $\theta_\mathrm{xx0} = \begin{cases}
-      0 & z = 0\text{のとき} \\
-      \arctan{\left(-\frac{y}{z}\right)} & z\neq 0\text{のとき}
-    \end{cases}$
+    \item $\theta_\mathrm{xx0} = \mathrm{atan2}\left(y, -z\right)$
     \item $\theta_\mathrm{xx2} = \begin{cases}
       \arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{前脚の場合} \\
       -\arccos{\frac{x^2 + y^2 + z^2 - l_\mathrm{t}^2 - l_\mathrm{s}^2}{2l_\mathrm{t}l_\mathrm{s}}} & \text{後脚の場合}
     \end{cases}$
     \item $\theta_\mathrm{xx1} = \mathrm{atan2}\left(
-      x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right),
-      x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)
+      \frac{x\left(-l_\mathrm{t} - l_\mathrm{s}\cos\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right)}
+      {l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}^2},
+      \frac{x\left(-l_\mathrm{s}\sin\theta_\mathrm{xx2}\right) + \sqrt{y^2 + z^2}\left(l_\mathrm{t} + l_\mathrm{s}\cos\theta_\mathrm{xx2}\right)}
+      {l_\mathrm{t}^2 + 2l_\mathrm{t}l_\mathrm{s}\cos\theta_\mathrm{xx2} + l_\mathrm{s}^2}
     \right)$
   \end{itemize}
+
+  逆運動学計算を実装する．
+  脚の付け根の関節角$\theta_\mathrm{xx0}, \theta_\mathrm{xx1}$は$\mathrm{atan2}$であり，引数両方がゼロの時にエラーになる可能性がある．
+  $\theta_\mathrm{xx0}$で引数両方がゼロになるのは$y = z = 0$のときで，この時は$\theta_\mathrm{xx0} = 0$とすることに決めていた．
+  $\theta_\mathrm{xx1}$は$\theta_\mathrm{xx1} = \pi$になって脚の長さがゼロにならない限り問題は起こらない．
+  $\theta_\mathrm{xx2}$は$\boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$の長さによって定義域を外れる．
+  脚の長さが長すぎるときは最大限に伸展した状態になるように例外処理を入れる．
 
 \end{document}
