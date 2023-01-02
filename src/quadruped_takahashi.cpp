@@ -32,12 +32,11 @@ void quadruped_takahashi::callback_imu_(
   auto tf_lh4  = lookup_transform_("base_link", "lhleg4", stamp, timeout);
   auto tf_rh4  = lookup_transform_("base_link", "rhleg4", stamp, timeout);
 
-  double const foot_radius = 0.01;
-  auto vec_lf4             = tfq_odom_base * vect_(tf_lf4);
-  auto vec_rf4             = tfq_odom_base * vect_(tf_rf4);
-  auto vec_lh4             = tfq_odom_base * vect_(tf_lh4);
-  auto vec_rh4             = tfq_odom_base * vect_(tf_rh4);
-  auto vec_odom_base       = Eigen::Vector3d(
+  auto vec_lf4       = tfq_odom_base * vect_(tf_lf4);
+  auto vec_rf4       = tfq_odom_base * vect_(tf_rf4);
+  auto vec_lh4       = tfq_odom_base * vect_(tf_lh4);
+  auto vec_rh4       = tfq_odom_base * vect_(tf_rh4);
+  auto vec_odom_base = Eigen::Vector3d(
       0, 0,
       foot_radius -
           std::min({vec_lf4.z(), vec_rf4.z(), vec_lh4.z(), vec_rh4.z()}));

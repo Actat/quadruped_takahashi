@@ -11,6 +11,15 @@
 
 class quadruped_takahashi : public rclcpp::Node {
 public:
+  double const length_t            = 0.1;
+  double const length_s            = 0.1;
+  double const foot_radius         = 0.01;
+  double const stand_hight         = 0.10;
+  Eigen::Vector3d const r_base_lf0 = Eigen::Vector3d(0.076, 0.04, 0);
+  Eigen::Vector3d const r_base_rf0 = Eigen::Vector3d(0.076, -0.04, 0);
+  Eigen::Vector3d const r_base_lh0 = Eigen::Vector3d(-0.076, 0.04, 0);
+  Eigen::Vector3d const r_base_rh0 = Eigen::Vector3d(-0.076, -0.04, 0);
+
   quadruped_takahashi();
 
 private:
