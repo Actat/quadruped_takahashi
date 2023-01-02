@@ -25,22 +25,22 @@ find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_msgs REQUIRED)
 
-add_executable(quadruped_takahashi_odometry
-  src/quadruped_takahashi_odometry.cpp
+add_executable(quadruped_takahashi
+  src/quadruped_takahashi.cpp
 )
-ament_target_dependencies(quadruped_takahashi_odometry
+ament_target_dependencies(quadruped_takahashi
   rclcpp
   sensor_msgs
   tf2_ros
   tf2_msgs
 )
-target_include_directories(quadruped_takahashi_odometry PUBLIC
+target_include_directories(quadruped_takahashi PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
 install(TARGETS
-quadruped_takahashi_odometry
+quadruped_takahashi
   DESTINATION lib/${PROJECT_NAME})
 
 install(
