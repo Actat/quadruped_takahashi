@@ -10,7 +10,7 @@
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 
-class quadruped_takahashi : public rclcpp::Node {
+class quadruped_takahashi_node : public rclcpp::Node {
 public:
   double const length_t            = 0.1;
   double const length_s            = 0.1;
@@ -21,7 +21,7 @@ public:
   Eigen::Vector3d const r_base_lh0 = Eigen::Vector3d(-0.076, 0.04, 0);
   Eigen::Vector3d const r_base_rh0 = Eigen::Vector3d(-0.076, -0.04, 0);
 
-  quadruped_takahashi();
+  quadruped_takahashi_node();
 
 private:
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
