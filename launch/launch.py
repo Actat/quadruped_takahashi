@@ -94,7 +94,7 @@ def generate_launch_description():
         name='imu_complementary_filter',
         parameters=[{
             'use_mag': True,
-            'publish_tf': True,
+            'publish_tf': False,
         }]
     )
 
