@@ -398,4 +398,25 @@
   $\theta_\mathrm{xx2}$は$\boldsymbol{r}_\mathrm{xx4}^\mathrm{base} - \boldsymbol{r}^\mathrm{base}_\mathrm{xx0}$の長さによって定義域を外れる．
   脚の長さが長すぎるときは最大限に伸展した状態になるように例外処理を入れる．
 
+\section{ロボットに指令を送る方法}
+
+ロボットに関連する処理はすべて\texttt{quadruped\_takahashi\_node}の処理として実装する．
+ロボットが行うべき操作（モータの制御モードを切り替える・姿勢を変える・歩行する）を外部から指令する仕組みが必要である．
+そこで入力が文字列で真理値と文字列を返すサービス\texttt{quadruped\_takahashi\_node/mode}がある．
+入力文字列に応じて処理を行い，問題なければ\texttt{true}を返す．
+問題がある場合は\texttt{false}と問題点を文字列で返す．
+
+サービスのコールバックには\texttt{void quadruped\_takahashi\_node::callback\_mode\_(...)}が設定されている．
+この関数は
+\begin{itemize}
+  \item 前のモードを解除
+  \item 入力の文字列に対応する関数の呼び出し
+\end{itemize}
+を行う．
+呼び出される関数は\texttt{void quadruped\_takahashi\_node::mode\_\{\text{文字列}\}\_(...)}としてある．
+サービスはノードの起動時に立ち上がるようにしてある．
+
+launchファイルによってノードを起動したら別のウインドウを開いてサービスを呼べる．
+例えば，モータをfreeするときは\texttt{ros2 service call /quadruped\_takahashi\_node/mode quadruped\_takahashi/srv/Mode "\{'data': 'motor\_free'\}"}とする．
+
 \end{document}

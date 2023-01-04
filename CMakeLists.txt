@@ -20,27 +20,41 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_msgs REQUIRED)
+find_package(kondo_b3m_ros2 REQUIRED)
 
-add_executable(quadruped_takahashi
+set(srv_files
+  "srv/Mode.srv"
+)
+rosidl_generate_interfaces(${PROJECT_NAME}
+  ${srv_files}
+)
+ament_export_dependencies(rosidl_default_runtime)
+
+add_executable(quadruped_takahashi_node
   src/quadruped_takahashi.cpp
 )
-ament_target_dependencies(quadruped_takahashi
+ament_target_dependencies(quadruped_takahashi_node
   rclcpp
   sensor_msgs
   tf2_ros
   tf2_msgs
+  kondo_b3m_ros2
 )
-target_include_directories(quadruped_takahashi PUBLIC
+target_include_directories(quadruped_takahashi_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
+rosidl_target_interfaces(quadruped_takahashi_node
+  ${PROJECT_NAME} "rosidl_typesupport_cpp"
+)
 
 install(TARGETS
-quadruped_takahashi
+quadruped_takahashi_node
   DESTINATION lib/${PROJECT_NAME})
 
 install(
