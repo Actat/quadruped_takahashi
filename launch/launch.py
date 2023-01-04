@@ -120,7 +120,7 @@ def generate_launch_description():
 
     quadruped_takahashi = Node(
         package='quadruped_takahashi',
-        executable='quadruped_takahashi',
+        executable='quadruped_takahashi_node',
         remappings=[('~/tf', 'tf')],
     )
 
