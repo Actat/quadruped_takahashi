@@ -198,7 +198,7 @@
   使用するパッケージをpackage.xmlに追記し，launchファイルにノードを起動する記述を追加した．
 
   \texttt{odom}から\texttt{base\_link}への\texttt{tf}をパブリッシュする
-  \texttt{quadruped\_takahashi\_odometry}というノードを作る．
+  \texttt{quadruped\_takahashi\_odometry\_node}というノードを作る．
   \texttt{/imu/data}をサブスクライブし，更新が入ったらコールバックで足の情報を参照して\texttt{tf}に情報を出す．
   ひとまず$xy$平面内での位置はゼロに固定し，高さは最も低い位置にある足が接地しているものとする．
 
@@ -400,23 +400,23 @@
 
 \section{ロボットに指令を送る方法}
 
-ロボットに関連する処理はすべて\texttt{quadruped\_takahashi\_node}の処理として実装する．
+ロボットの制御に関連する処理は\texttt{quadruped\_takahashi\_control\_node}の処理として実装する．
 ロボットが行うべき操作（モータの制御モードを切り替える・姿勢を変える・歩行する）を外部から指令する仕組みが必要である．
-そこで入力が文字列で真理値と文字列を返すサービス\texttt{quadruped\_takahashi\_node/mode}がある．
+そこで入力が文字列で真理値と文字列を返すサービス\texttt{quadruped\_takahashi\_control\_node/mode}がある．
 入力文字列に応じて処理を行い，問題なければ\texttt{true}を返す．
 問題がある場合は\texttt{false}と問題点を文字列で返す．
 
-サービスのコールバックには\texttt{void quadruped\_takahashi\_node::callback\_mode\_(...)}が設定されている．
+サービスのコールバックには\texttt{void quadruped\_takahashi\_control\_node::callback\_mode\_(...)}が設定されている．
 この関数は
 \begin{itemize}
   \item 前のモードを解除
   \item 入力の文字列に対応する関数の呼び出し
 \end{itemize}
 を行う．
-呼び出される関数は\texttt{void quadruped\_takahashi\_node::mode\_\{\text{文字列}\}\_(...)}としてある．
+呼び出される関数は\texttt{void quadruped\_takahashi\_control\_node::mode\_\{\text{文字列}\}\_(...)}としてある．
 サービスはノードの起動時に立ち上がるようにしてある．
 
 launchファイルによってノードを起動したら別のウインドウを開いてサービスを呼べる．
-例えば，モータをfreeするときは\texttt{ros2 service call /quadruped\_takahashi\_node/mode quadruped\_takahashi/srv/Mode "\{'data': 'motor\_free'\}"}とする．
+例えば，モータをfreeするときは\texttt{ros2 service call /quadruped\_takahashi\_control\_node/mode quadruped\_takahashi/srv/Mode "\{'data': 'motor\_free'\}"}とする．
 
 \end{document}

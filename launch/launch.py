@@ -118,10 +118,15 @@ def generate_launch_description():
         ]}],
     )
 
-    quadruped_takahashi = Node(
+    quadruped_takahashi_odometry_node = Node(
         package='quadruped_takahashi',
-        executable='quadruped_takahashi_node',
+        executable='quadruped_takahashi_odometry_node',
         remappings=[('~/tf', 'tf')],
+    )
+
+    quadruped_takahashi_control_node = Node(
+        package='quadruped_takahashi',
+        executable='quadruped_takahashi_control_node',
     )
 
     ld = LaunchDescription()
@@ -133,6 +138,7 @@ def generate_launch_description():
     ld.add_action(imu_complementary_filter_node)
     ld.add_action(rviz_node)
     ld.add_action(kondo_b3m_ros2_node)
-    ld.add_action(quadruped_takahashi)
+    ld.add_action(quadruped_takahashi_odometry_node)
+    ld.add_action(quadruped_takahashi_control_node)
 
     return ld

@@ -35,26 +35,40 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 )
 ament_export_dependencies(rosidl_default_runtime)
 
-add_executable(quadruped_takahashi_node
-  src/quadruped_takahashi.cpp
+add_executable(quadruped_takahashi_odometry_node
+  src/quadruped_takahashi_odometry.cpp
 )
-ament_target_dependencies(quadruped_takahashi_node
+ament_target_dependencies(quadruped_takahashi_odometry_node
   rclcpp
+  tf2_ros
   sensor_msgs
+  tf2_msgs
+)
+target_include_directories(quadruped_takahashi_odometry_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+
+add_executable(quadruped_takahashi_control_node
+  src/quadruped_takahashi_control.cpp
+)
+ament_target_dependencies(quadruped_takahashi_control_node
+  rclcpp
   tf2_ros
   tf2_msgs
   kondo_b3m_ros2
 )
-target_include_directories(quadruped_takahashi_node PUBLIC
+target_include_directories(quadruped_takahashi_control_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-rosidl_target_interfaces(quadruped_takahashi_node
+rosidl_target_interfaces(quadruped_takahashi_control_node
   ${PROJECT_NAME} "rosidl_typesupport_cpp"
 )
 
 install(TARGETS
-quadruped_takahashi_node
+quadruped_takahashi_odometry_node
+quadruped_takahashi_control_node
   DESTINATION lib/${PROJECT_NAME})
 
 install(
