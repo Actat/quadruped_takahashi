@@ -43,6 +43,7 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': use_sim_time,
             'robot_description': robot_desc,
+            'publish_frequency': 1000.0,
         }],
         arguments=[urdf_path],
     )
