@@ -89,7 +89,7 @@ def generate_launch_description():
     kondo_b3m_ros2_node = Node(
         package='kondo_b3m_ros2',
         executable='kondo_b3m',
-        remappings=[('b3m_joint_state', 'joint_states')],
+        remappings=[('~/joint_states', '/joint_states')],
         parameters=[{'motor_list': [
             "{'id': 0, 'name': 'lf0', 'direction': False}",
             "{'id': 1, 'name': 'lf1', 'direction': False}",
