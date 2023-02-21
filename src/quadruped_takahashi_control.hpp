@@ -4,9 +4,8 @@
 #include <array>
 #include <chrono>
 #include <eigen3/Eigen/Geometry>
-#include "kondo_b3m_ros2/srv/desired_position.hpp"
-#include "kondo_b3m_ros2/srv/motor_free.hpp"
-#include "kondo_b3m_ros2/srv/start_position_control.hpp"
+#include "kondo_b3m_ros2/srv/control_mode.hpp"
+#include "kondo_b3m_ros2/srv/desired.hpp"
 #include "quadruped_takahashi/srv/mode.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
@@ -28,18 +27,19 @@ public:
 
 private:
   std::chrono::duration<int, std::milli> const control_period_ =
-      std::chrono::duration<int, std::milli>(10);
+      std::chrono::duration<int, std::milli>(20);
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Service<quadruped_takahashi::srv::Mode>::SharedPtr service_mode_;
 
-  rclcpp::Client<kondo_b3m_ros2::srv::MotorFree>::SharedPtr client_b3m_mf_;
-  rclcpp::Client<kondo_b3m_ros2::srv::StartPositionControl>::SharedPtr
-      client_b3m_spc_;
-  rclcpp::Client<kondo_b3m_ros2::srv::DesiredPosition>::SharedPtr
-      client_b3m_dp_;
+  rclcpp::Client<kondo_b3m_ros2::srv::ControlMode>::SharedPtr client_b3m_mode_;
+  rclcpp::Client<kondo_b3m_ros2::srv::Desired>::SharedPtr client_b3m_desired_;
+
+  std::vector<std::string> const joint_list_ = {"lf0", "lf1", "lf2", "rf0",
+                                                "rf1", "rf2", "lh0", "lh1",
+                                                "lh2", "rh0", "rh1", "rh2"};
 
   void callback_mode_(
       std::shared_ptr<quadruped_takahashi::srv::Mode::Request> const request,
