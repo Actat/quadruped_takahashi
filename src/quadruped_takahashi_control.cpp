@@ -25,6 +25,7 @@ quadruped_takahashi_control_node::quadruped_takahashi_control_node()
 void quadruped_takahashi_control_node::callback_mode_(
     std::shared_ptr<quadruped_takahashi::srv::Mode::Request> const request,
     std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response) {
+  RCLCPP_INFO(this->get_logger(), "Mode change to " + request->data);
   timer_ = nullptr;
   if (request->data == "motor_free") {
     mode_motor_free_(response);
