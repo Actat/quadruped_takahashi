@@ -50,6 +50,7 @@ void quadruped_takahashi_control_node::mode_motor_free_(
       {"f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f"});
   if (!client_b3m_mode_->wait_for_service(
           std::chrono::duration<int, std::milli>(5))) {
+    RCLCPP_WARN(this->get_logger(), "Failed to free b3m motor.");
     response->success = false;
     return;
   }
