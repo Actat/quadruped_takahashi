@@ -91,7 +91,7 @@ def generate_launch_description():
         executable='kondo_b3m',
         remappings=[('~/joint_states', '/joint_states')],
         parameters=[{
-            'publish_frequency': 10,
+            'publish_frequency': 50,
             'motor_list': [
                 "{'id': 0, 'name': 'lf0', 'direction': False}",
                 "{'id': 1, 'name': 'lf1', 'direction': False}",
