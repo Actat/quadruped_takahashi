@@ -27,7 +27,7 @@ public:
 
 private:
   std::chrono::duration<int, std::milli> const control_period_ =
-      std::chrono::duration<int, std::milli>(20);
+      std::chrono::duration<int, std::milli>(30);
   std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
