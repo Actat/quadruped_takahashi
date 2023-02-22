@@ -74,7 +74,7 @@ void quadruped_takahashi_control_node::mode_start_position_control_(
 void quadruped_takahashi_control_node::mode_stand_(
     std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response) {
   timer_ = this->create_wall_timer(
-      std::chrono::microseconds(10000),
+      control_period_,
       std::bind(&quadruped_takahashi_control_node::timer_callback_stand_,
                 this));
   response->success = true;
