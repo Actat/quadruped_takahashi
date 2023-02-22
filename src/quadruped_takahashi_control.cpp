@@ -15,10 +15,10 @@ quadruped_takahashi_control_node::quadruped_takahashi_control_node()
       "~/mode", std::bind(&quadruped_takahashi_control_node::callback_mode_,
                           this, std::placeholders::_1, std::placeholders::_2));
 
-  client_b3m_mode_ =
-      this->create_client<kondo_b3m_ros2::srv::ControlMode>("/kondo_b3m_mode");
+  client_b3m_mode_ = this->create_client<kondo_b3m_ros2::srv::ControlMode>(
+      "/kondo_b3m/control_mode");
   client_b3m_desired_ =
-      this->create_client<kondo_b3m_ros2::srv::Desired>("/kondo_b3m_desired");
+      this->create_client<kondo_b3m_ros2::srv::Desired>("/kondo_b3m/desired");
   timer_ = nullptr;
 }
 
