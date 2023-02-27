@@ -106,18 +106,18 @@ def generate_launch_description():
         parameters=[{
             'publish_frequency': 50,
             'motor_list': [
-                "{'id': 0, 'mode': 'B3M-SC-1170-A', 'name': 'lf0', 'direction': False}",
-                "{'id': 1, 'mode': 'B3M-SC-1170-A', 'name': 'lf1', 'direction': False}",
-                "{'id': 2, 'mode': 'B3M-SC-1170-A', 'name': 'lf2', 'direction': False}",
-                "{'id': 3, 'mode': 'B3M-SC-1170-A', 'name': 'rf0', 'direction': False}",
-                "{'id': 4, 'mode': 'B3M-SC-1170-A', 'name': 'rf1'}",
-                "{'id': 5, 'mode': 'B3M-SC-1170-A', 'name': 'rf2'}",
-                "{'id': 6, 'mode': 'B3M-SC-1170-A', 'name': 'lh0'}",
-                "{'id': 7, 'mode': 'B3M-SC-1170-A', 'name': 'lh1', 'direction': False}",
-                "{'id': 8, 'mode': 'B3M-SC-1170-A', 'name': 'lh2', 'direction': False}",
-                "{'id': 9, 'mode': 'B3M-SC-1170-A', 'name': 'rh0'}",
-                "{'id': 10, 'mode': 'B3M-SC-1170-A', 'name': 'rh1'}",
-                "{'id': 11, 'mode': 'B3M-SC-1170-A', 'name': 'rh2'}"
+                "{'id': 0, 'model': 'B3M-SC-1170-A', 'name': 'lf0', 'direction': False}",
+                "{'id': 1, 'model': 'B3M-SC-1170-A', 'name': 'lf1', 'direction': False}",
+                "{'id': 2, 'model': 'B3M-SC-1170-A', 'name': 'lf2', 'direction': False}",
+                "{'id': 3, 'model': 'B3M-SC-1170-A', 'name': 'rf0', 'direction': False}",
+                "{'id': 4, 'model': 'B3M-SC-1170-A', 'name': 'rf1'}",
+                "{'id': 5, 'model': 'B3M-SC-1170-A', 'name': 'rf2'}",
+                "{'id': 6, 'model': 'B3M-SC-1170-A', 'name': 'lh0'}",
+                "{'id': 7, 'model': 'B3M-SC-1170-A', 'name': 'lh1', 'direction': False}",
+                "{'id': 8, 'model': 'B3M-SC-1170-A', 'name': 'lh2', 'direction': False}",
+                "{'id': 9, 'model': 'B3M-SC-1170-A', 'name': 'rh0'}",
+                "{'id': 10, 'model': 'B3M-SC-1170-A', 'name': 'rh1'}",
+                "{'id': 11, 'model': 'B3M-SC-1170-A', 'name': 'rh2'}"
             ]}],
     )
 
