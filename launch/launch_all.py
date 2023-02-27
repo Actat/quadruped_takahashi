@@ -106,18 +106,18 @@ def generate_launch_description():
         parameters=[{
             'publish_frequency': 50,
             'motor_list': [
-                "{'id': 0, 'name': 'lf0', 'direction': False}",
-                "{'id': 1, 'name': 'lf1', 'direction': False}",
-                "{'id': 2, 'name': 'lf2', 'direction': False}",
-                "{'id': 3, 'name': 'rf0', 'direction': False}",
-                "{'id': 4, 'name': 'rf1'}",
-                "{'id': 5, 'name': 'rf2'}",
-                "{'id': 6, 'name': 'lh0'}",
-                "{'id': 7, 'name': 'lh1', 'direction': False}",
-                "{'id': 8, 'name': 'lh2', 'direction': False}",
-                "{'id': 9, 'name': 'rh0'}",
-                "{'id': 10, 'name': 'rh1'}",
-                "{'id': 11, 'name': 'rh2'}"
+                "{'id': 0, 'mode': 'B3M-SC-1170-A', 'name': 'lf0', 'direction': False}",
+                "{'id': 1, 'mode': 'B3M-SC-1170-A', 'name': 'lf1', 'direction': False}",
+                "{'id': 2, 'mode': 'B3M-SC-1170-A', 'name': 'lf2', 'direction': False}",
+                "{'id': 3, 'mode': 'B3M-SC-1170-A', 'name': 'rf0', 'direction': False}",
+                "{'id': 4, 'mode': 'B3M-SC-1170-A', 'name': 'rf1'}",
+                "{'id': 5, 'mode': 'B3M-SC-1170-A', 'name': 'rf2'}",
+                "{'id': 6, 'mode': 'B3M-SC-1170-A', 'name': 'lh0'}",
+                "{'id': 7, 'mode': 'B3M-SC-1170-A', 'name': 'lh1', 'direction': False}",
+                "{'id': 8, 'mode': 'B3M-SC-1170-A', 'name': 'lh2', 'direction': False}",
+                "{'id': 9, 'mode': 'B3M-SC-1170-A', 'name': 'rh0'}",
+                "{'id': 10, 'mode': 'B3M-SC-1170-A', 'name': 'rh1'}",
+                "{'id': 11, 'mode': 'B3M-SC-1170-A', 'name': 'rh2'}"
             ]}],
     )
 
