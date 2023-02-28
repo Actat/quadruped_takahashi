@@ -82,14 +82,46 @@ void quadruped_takahashi_control_node::mode_stand_(
 }
 
 void quadruped_takahashi_control_node::timer_callback_stand_() {
+  auto stamp   = std_msgs::msg::Header().stamp;
+  auto timeout = tf2::durationFromSec(1.0);
+  geometry_msgs::msg::TransformStamped tf_base, tf_lf0, tf_rf0, tf_lh0, tf_rh0;
+  try {
+    tf_base = lookup_transform_("map", "base_link", stamp, timeout);
+    tf_lf0  = lookup_transform_("base_link", "lfleg0", stamp, timeout);
+    tf_rf0  = lookup_transform_("base_link", "rfleg0", stamp, timeout);
+    tf_lh0  = lookup_transform_("base_link", "lhleg0", stamp, timeout);
+    tf_rh0  = lookup_transform_("base_link", "rhleg0", stamp, timeout);
+  } catch (tf2::LookupException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  } catch (tf2::ConnectivityException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  } catch (tf2::ExtrapolationException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  } catch (tf2::InvalidArgumentException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  }
+
+  auto vec_lf4 = quat_(tf_base) * vect_(tf_lf0);
+  auto vec_rf4 = quat_(tf_base) * vect_(tf_rf0);
+  auto vec_lh4 = quat_(tf_base) * vect_(tf_lh0);
+  auto vec_rh4 = quat_(tf_base) * vect_(tf_rh0);
+
   auto ar_lf =
-      ik_lf_(r_base_lf0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+      ik_lf_(r_base_lf0 +
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_lf4.z()));
   auto ar_rf =
-      ik_rf_(r_base_rf0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+      ik_rf_(r_base_rf0 +
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_rf4.z()));
   auto ar_lh =
-      ik_lh_(r_base_lh0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+      ik_lh_(r_base_lh0 +
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_lh4.z()));
   auto ar_rh =
-      ik_rh_(r_base_rh0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
+      ik_rh_(r_base_rh0 +
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_rh4.z()));
 
   auto req   = std::make_shared<kondo_b3m_ros2::srv::Desired::Request>();
   req->name  = joint_list_;
