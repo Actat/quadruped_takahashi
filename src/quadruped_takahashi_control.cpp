@@ -112,16 +112,16 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
 
   auto ar_lf =
       ik_lf_(r_base_lf0 +
-             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_lf4.z()));
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius + vec_lf4.z()));
   auto ar_rf =
       ik_rf_(r_base_rf0 +
-             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_rf4.z()));
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius + vec_rf4.z()));
   auto ar_lh =
       ik_lh_(r_base_lh0 +
-             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_lh4.z()));
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius + vec_lh4.z()));
   auto ar_rh =
       ik_rh_(r_base_rh0 +
-             Eigen::Vector3d(0, 0, -stand_hight + foot_radius - vec_rh4.z()));
+             Eigen::Vector3d(0, 0, -stand_hight + foot_radius + vec_rh4.z()));
 
   auto req   = std::make_shared<kondo_b3m_ros2::srv::Desired::Request>();
   req->name  = joint_list_;
