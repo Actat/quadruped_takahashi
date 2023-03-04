@@ -131,13 +131,13 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
                 Kp * diff_lf0_last;
   feedback_rf = feedback_rf +
                 (Kp + 0.001 * control_period_.count() * Ki) * diff_rf0 -
-                Kp * diff_lf0_last;
+                Kp * diff_rf0_last;
   feedback_lh = feedback_lh +
                 (Kp + 0.001 * control_period_.count() * Ki) * diff_lh0 -
-                Kp * diff_lf0_last;
+                Kp * diff_lh0_last;
   feedback_rh = feedback_rh +
                 (Kp + 0.001 * control_period_.count() * Ki) * diff_rh0 -
-                Kp * diff_lf0_last;
+                Kp * diff_rh0_last;
   diff_lf0_last = diff_lf0;
   diff_rf0_last = diff_rf0;
   diff_lh0_last = diff_lh0;
