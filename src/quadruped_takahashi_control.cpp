@@ -120,9 +120,9 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
   auto static feedback_lh        = Eigen::Vector3d(0, 0, 0);
   auto static feedback_rh        = Eigen::Vector3d(0, 0, 0);
   auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
-  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
-  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
-  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
+  auto static diff_rf0_last      = Eigen::Vector3d(0, 0, 0);
+  auto static diff_lh0_last      = Eigen::Vector3d(0, 0, 0);
+  auto static diff_rh0_last      = Eigen::Vector3d(0, 0, 0);
   double const Kp                = 1.0;
   double const Ki                = 0.0;
 
