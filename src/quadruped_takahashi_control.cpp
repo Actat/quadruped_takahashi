@@ -110,18 +110,39 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
   auto vec_lh4 = quat_(tf_base) * vect_(tf_lh0);
   auto vec_rh4 = quat_(tf_base) * vect_(tf_rh0);
 
-  auto ar_lf = ik_lf_(
+  double const leg_opening_width = 0.02;
+  auto const time_constant       = std::chrono::duration<int, std::milli>(10);
+  double const rate              = 1.0 * time_constant.count() /
+                      (time_constant.count() + control_period_.count());
+  auto static feedback_lf = Eigen::Vector3d(0, 0, 0);
+  auto static feedback_rf = Eigen::Vector3d(0, 0, 0);
+  auto static feedback_lh = Eigen::Vector3d(0, 0, 0);
+  auto static feedback_rh = Eigen::Vector3d(0, 0, 0);
+  feedback_lf =
+      rate * feedback_lf + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_lf4.z());
+  feedback_rf =
+      rate * feedback_rf + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_rf4.z());
+  feedback_lh =
+      rate * feedback_lh + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_lh4.z());
+  feedback_rh =
+      rate * feedback_rh + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_rh4.z());
+
+  auto ar_lf = ik_lf_(  //
       r_base_lf0 +
-      Eigen::Vector3d(0, 0.02, -stand_hight + foot_radius + vec_lf4.z()));
-  auto ar_rf = ik_rf_(
+      Eigen::Vector3d(0, leg_opening_width, -stand_hight + foot_radius) +
+      feedback_lf);
+  auto ar_rf = ik_rf_(  //
       r_base_rf0 +
-      Eigen::Vector3d(0, -0.02, -stand_hight + foot_radius + vec_rf4.z()));
-  auto ar_lh = ik_lh_(
+      Eigen::Vector3d(0, -leg_opening_width, -stand_hight + foot_radius) +
+      feedback_rf);
+  auto ar_lh = ik_lh_(  //
       r_base_lh0 +
-      Eigen::Vector3d(0, 0.02, -stand_hight + foot_radius + vec_lh4.z()));
-  auto ar_rh = ik_rh_(
+      Eigen::Vector3d(0, leg_opening_width, -stand_hight + foot_radius) +
+      feedback_lh);
+  auto ar_rh = ik_rh_(  //
       r_base_rh0 +
-      Eigen::Vector3d(0, -0.02, -stand_hight + foot_radius + vec_rh4.z()));
+      Eigen::Vector3d(0, -leg_opening_width, -stand_hight + foot_radius) +
+      feedback_rh);
 
   auto req   = std::make_shared<kondo_b3m_ros2::srv::Desired::Request>();
   req->name  = joint_list_;
