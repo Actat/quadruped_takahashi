@@ -105,27 +105,43 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
     return;
   }
 
-  auto vec_lf4 = quat_(tf_base) * vect_(tf_lf0);
-  auto vec_rf4 = quat_(tf_base) * vect_(tf_rf0);
-  auto vec_lh4 = quat_(tf_base) * vect_(tf_lh0);
-  auto vec_rh4 = quat_(tf_base) * vect_(tf_rh0);
+  auto diff_lf0 = Eigen::Vector3d(
+      0, 0, (vect_(tf_lf0) - quat_(tf_base) * vect_(tf_lf0)).z());
+  auto diff_rf0 = Eigen::Vector3d(
+      0, 0, (vect_(tf_rf0) - quat_(tf_base) * vect_(tf_rf0)).z());
+  auto diff_lh0 = Eigen::Vector3d(
+      0, 0, (vect_(tf_lh0) - quat_(tf_base) * vect_(tf_lh0)).z());
+  auto diff_rh0 = Eigen::Vector3d(
+      0, 0, (vect_(tf_rh0) - quat_(tf_base) * vect_(tf_rh0)).z());
 
   double const leg_opening_width = 0.02;
-  auto const time_constant       = std::chrono::duration<int, std::milli>(10);
-  double const rate              = 1.0 * time_constant.count() /
-                      (time_constant.count() + control_period_.count());
-  auto static feedback_lf = Eigen::Vector3d(0, 0, 0);
-  auto static feedback_rf = Eigen::Vector3d(0, 0, 0);
-  auto static feedback_lh = Eigen::Vector3d(0, 0, 0);
-  auto static feedback_rh = Eigen::Vector3d(0, 0, 0);
-  feedback_lf =
-      rate * feedback_lf + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_lf4.z());
-  feedback_rf =
-      rate * feedback_rf + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_rf4.z());
-  feedback_lh =
-      rate * feedback_lh + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_lh4.z());
-  feedback_rh =
-      rate * feedback_rh + (1.0 - rate) * Eigen::Vector3d(0, 0, vec_rh4.z());
+  auto static feedback_lf        = Eigen::Vector3d(0, 0, 0);
+  auto static feedback_rf        = Eigen::Vector3d(0, 0, 0);
+  auto static feedback_lh        = Eigen::Vector3d(0, 0, 0);
+  auto static feedback_rh        = Eigen::Vector3d(0, 0, 0);
+  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
+  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
+  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
+  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
+  double const Kp                = 1.0;
+  double const Ki                = 0.0;
+
+  feedback_lf = feedback_lf +
+                (Kp + 0.001 * control_period_.count() * Ki) * diff_lf0 -
+                Kp * diff_lf0_last;
+  feedback_rf = feedback_rf +
+                (Kp + 0.001 * control_period_.count() * Ki) * diff_rf0 -
+                Kp * diff_lf0_last;
+  feedback_lh = feedback_lh +
+                (Kp + 0.001 * control_period_.count() * Ki) * diff_lh0 -
+                Kp * diff_lf0_last;
+  feedback_rh = feedback_rh +
+                (Kp + 0.001 * control_period_.count() * Ki) * diff_rh0 -
+                Kp * diff_lf0_last;
+  diff_lf0_last = diff_lf0;
+  diff_lf0_last = diff_rf0;
+  diff_lf0_last = diff_lh0;
+  diff_lf0_last = diff_rh0;
 
   auto ar_lf = ik_lf_(  //
       r_base_lf0 +
