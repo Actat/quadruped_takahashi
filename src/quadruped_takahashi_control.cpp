@@ -139,9 +139,9 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
                 (Kp + 0.001 * control_period_.count() * Ki) * diff_rh0 -
                 Kp * diff_lf0_last;
   diff_lf0_last = diff_lf0;
-  diff_lf0_last = diff_rf0;
-  diff_lf0_last = diff_lh0;
-  diff_lf0_last = diff_rh0;
+  diff_rf0_last = diff_rf0;
+  diff_lh0_last = diff_lh0;
+  diff_rh0_last = diff_rh0;
 
   auto ar_lf = ik_lf_(  //
       r_base_lf0 +
