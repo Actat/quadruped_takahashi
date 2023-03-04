@@ -124,20 +124,22 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
   auto static diff_lh0_last      = Eigen::Vector3d(0, 0, 0);
   auto static diff_rh0_last      = Eigen::Vector3d(0, 0, 0);
   double const Kp                = -0.7;
-  double const Ki                = Kp / 0.3;
+  double const Td                = 1;
+  double const T                 = control_period_.count() / 1000.0;
+  double const eta               = 0.125;
 
-  feedback_lf = feedback_lf +
-                (Kp + 0.001 * control_period_.count() * Ki) * diff_lf0 -
-                Kp * diff_lf0_last;
-  feedback_rf = feedback_rf +
-                (Kp + 0.001 * control_period_.count() * Ki) * diff_rf0 -
-                Kp * diff_rf0_last;
-  feedback_lh = feedback_lh +
-                (Kp + 0.001 * control_period_.count() * Ki) * diff_lh0 -
-                Kp * diff_lh0_last;
-  feedback_rh = feedback_rh +
-                (Kp + 0.001 * control_period_.count() * Ki) * diff_rh0 -
-                Kp * diff_rh0_last;
+  feedback_lf = eta * Td / (T + eta * Td) * feedback_lf +
+                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_lf0 -
+                Kp * (eta * Td + Td) / (T + eta * Td) * diff_lf0_last;
+  feedback_rf = eta * Td / (T + eta * Td) * feedback_rf +
+                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_rf0 -
+                Kp * (eta * Td + Td) / (T + eta * Td) * diff_rf0_last;
+  feedback_lh = eta * Td / (T + eta * Td) * feedback_lh +
+                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_lh0 -
+                Kp * (eta * Td + Td) / (T + eta * Td) * diff_lh0_last;
+  feedback_rh = eta * Td / (T + eta * Td) * feedback_rh +
+                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_rh0 -
+                Kp * (eta * Td + Td) / (T + eta * Td) * diff_rh0_last;
   diff_lf0_last = diff_lf0;
   diff_rf0_last = diff_rf0;
   diff_lh0_last = diff_lh0;
