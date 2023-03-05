@@ -105,62 +105,77 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
     return;
   }
 
-  auto diff_lf0 = Eigen::Vector3d(
+  auto X_lf0 = Eigen::Vector3d(
       0, 0, (vect_(tf_lf0) - quat_(tf_base) * vect_(tf_lf0)).z());
-  auto diff_rf0 = Eigen::Vector3d(
+  auto X_rf0 = Eigen::Vector3d(
       0, 0, (vect_(tf_rf0) - quat_(tf_base) * vect_(tf_rf0)).z());
-  auto diff_lh0 = Eigen::Vector3d(
+  auto X_lh0 = Eigen::Vector3d(
       0, 0, (vect_(tf_lh0) - quat_(tf_base) * vect_(tf_lh0)).z());
-  auto diff_rh0 = Eigen::Vector3d(
+  auto X_rh0 = Eigen::Vector3d(
       0, 0, (vect_(tf_rh0) - quat_(tf_base) * vect_(tf_rh0)).z());
 
+  auto static X_lf0_last = Eigen::Vector3d(0, 0, 0);
+  auto static X_rf0_last = Eigen::Vector3d(0, 0, 0);
+  auto static X_lh0_last = Eigen::Vector3d(0, 0, 0);
+  auto static X_rh0_last = Eigen::Vector3d(0, 0, 0);
+  auto static Yi_lf      = Eigen::Vector3d(0, 0, 0);
+  auto static Yi_rf      = Eigen::Vector3d(0, 0, 0);
+  auto static Yi_lh      = Eigen::Vector3d(0, 0, 0);
+  auto static Yi_rh      = Eigen::Vector3d(0, 0, 0);
+  auto static Yd_lf      = Eigen::Vector3d(0, 0, 0);
+  auto static Yd_rf      = Eigen::Vector3d(0, 0, 0);
+  auto static Yd_lh      = Eigen::Vector3d(0, 0, 0);
+  auto static Yd_rh      = Eigen::Vector3d(0, 0, 0);
+
+  double const Kp  = 0.7;
+  double const Ti  = 100000;
+  double const Td  = 0.0;
+  double const T   = control_period_.count() / 1000.0;
+  double const eta = 0.125;
+
+  auto Yp_lf = Kp * X_lf0;
+  auto Yp_rf = Kp * X_rf0;
+  auto Yp_lh = Kp * X_lh0;
+  auto Yp_rh = Kp * X_rh0;
+  Yi_lf      = Yi_lf + Kp * T / Ti * X_lf0;
+  Yi_rf      = Yi_rf + Kp * T / Ti * X_rf0;
+  Yi_lh      = Yi_lh + Kp * T / Ti * X_lh0;
+  Yi_rh      = Yi_rh + Kp * T / Ti * X_rh0;
+  Yd_lf      = (eta * Td) / (T + eta * Td) * Yd_lf +
+          (Kp * Td) / (T + eta * Td) * X_lf0 -
+          (Kp * Td) / (T + eta * Td) * X_lf0_last;
+  Yd_rf = (eta * Td) / (T + eta * Td) * Yd_rf +
+          (Kp * Td) / (T + eta * Td) * X_rf0 -
+          (Kp * Td) / (T + eta * Td) * X_rf0_last;
+  Yd_lh = (eta * Td) / (T + eta * Td) * Yd_lh +
+          (Kp * Td) / (T + eta * Td) * X_lh0 -
+          (Kp * Td) / (T + eta * Td) * X_lh0_last;
+  Yd_rh = (eta * Td) / (T + eta * Td) * Yd_rh +
+          (Kp * Td) / (T + eta * Td) * X_rh0 -
+          (Kp * Td) / (T + eta * Td) * X_rh0_last;
+  auto Y_lf = Yp_lf + Yi_lf + Yd_lf;
+  auto Y_rf = Yp_rf + Yi_rf + Yd_rf;
+  auto Y_lh = Yp_lh + Yi_lh + Yd_lh;
+  auto Y_rh = Yp_rh + Yi_rh + Yd_rh;
+
+  X_lf0_last = X_lf0;
+  X_rf0_last = X_rf0;
+  X_lh0_last = X_lh0;
+  X_rh0_last = X_rh0;
+
   double const leg_opening_width = 0.02;
-  auto static feedback_lf        = Eigen::Vector3d(0, 0, 0);
-  auto static feedback_rf        = Eigen::Vector3d(0, 0, 0);
-  auto static feedback_lh        = Eigen::Vector3d(0, 0, 0);
-  auto static feedback_rh        = Eigen::Vector3d(0, 0, 0);
-  auto static diff_lf0_last      = Eigen::Vector3d(0, 0, 0);
-  auto static diff_rf0_last      = Eigen::Vector3d(0, 0, 0);
-  auto static diff_lh0_last      = Eigen::Vector3d(0, 0, 0);
-  auto static diff_rh0_last      = Eigen::Vector3d(0, 0, 0);
-  double const Kp                = -0.7;
-  double const Td                = 1;
-  double const T                 = control_period_.count() / 1000.0;
-  double const eta               = 0.125;
-
-  feedback_lf = eta * Td / (T + eta * Td) * feedback_lf +
-                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_lf0 -
-                Kp * (eta * Td + Td) / (T + eta * Td) * diff_lf0_last;
-  feedback_rf = eta * Td / (T + eta * Td) * feedback_rf +
-                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_rf0 -
-                Kp * (eta * Td + Td) / (T + eta * Td) * diff_rf0_last;
-  feedback_lh = eta * Td / (T + eta * Td) * feedback_lh +
-                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_lh0 -
-                Kp * (eta * Td + Td) / (T + eta * Td) * diff_lh0_last;
-  feedback_rh = eta * Td / (T + eta * Td) * feedback_rh +
-                Kp * (T + eta * Td + Td) / (T + eta * Td) * diff_rh0 -
-                Kp * (eta * Td + Td) / (T + eta * Td) * diff_rh0_last;
-  diff_lf0_last = diff_lf0;
-  diff_rf0_last = diff_rf0;
-  diff_lh0_last = diff_lh0;
-  diff_rh0_last = diff_rh0;
-
-  auto ar_lf = ik_lf_(  //
-      r_base_lf0 +
-      Eigen::Vector3d(0, leg_opening_width, -stand_hight + foot_radius) +
-      feedback_lf);
-  auto ar_rf = ik_rf_(  //
-      r_base_rf0 +
-      Eigen::Vector3d(0, -leg_opening_width, -stand_hight + foot_radius) +
-      feedback_rf);
-  auto ar_lh = ik_lh_(  //
-      r_base_lh0 +
-      Eigen::Vector3d(0, leg_opening_width, -stand_hight + foot_radius) +
-      feedback_lh);
-  auto ar_rh = ik_rh_(  //
-      r_base_rh0 +
-      Eigen::Vector3d(0, -leg_opening_width, -stand_hight + foot_radius) +
-      feedback_rh);
+  auto ar_lf =
+      ik_lf_(-Y_lf + r_base_lf0 +
+             Eigen::Vector3d(0, leg_opening_width, -stand_hight + foot_radius));
+  auto ar_rf = ik_rf_(
+      -Y_rf + r_base_rf0 +
+      Eigen::Vector3d(0, -leg_opening_width, -stand_hight + foot_radius));
+  auto ar_lh =
+      ik_lh_(-Y_lh + r_base_lh0 +
+             Eigen::Vector3d(0, leg_opening_width, -stand_hight + foot_radius));
+  auto ar_rh = ik_rh_(
+      -Y_rh + r_base_rh0 +
+      Eigen::Vector3d(0, -leg_opening_width, -stand_hight + foot_radius));
 
   auto req   = std::make_shared<kondo_b3m_ros2::srv::Desired::Request>();
   req->name  = joint_list_;
