@@ -34,6 +34,9 @@
         </visual>
     </link>
 
+    <link name="imu_link">
+    </link>
+
     <link name="lfleg0">
         <visual>
             <geometry>
@@ -197,6 +200,12 @@
             <material name="black"/>
         </visual>
     </link>
+
+    <joint name="base_imu" type="fixed">
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+        <origin xyz="0 0 0.05" rpy="0 0 1.57079633"/>
+    </joint>
 
     <joint name="base_lfleg0" type="fixed">
         <parent link="base_link"/>
