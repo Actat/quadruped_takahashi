@@ -1,6 +1,7 @@
 \documentclass[a4paper]{jlreq}
 \usepackage[haranoaji]{luatexja-preset}
 
+\usepackage{url}
 \usepackage{amsmath, amssymb}
 \usepackage{bm}
 \usepackage{siunitx}
@@ -418,5 +419,82 @@
 
 launchファイルによってノードを起動したら別のウインドウを開いてサービスを呼べる．
 例えば，モータをfreeするときは\texttt{ros2 service call /quadruped\_takahashi\_control\_node/mode quadruped\_takahashi/srv/Mode "\{'data': 'motor\_free'\}"}とする．
+
+\section{ロボットをまっすぐ立たせる（standモード）}
+
+standモードでの処理は\texttt{void quadruped\_takahashi\_control\_node::timer\_callback\_stand\_()}に記述されている．
+このモードでの制御の目標は\texttt{base\_link}の$x, y$軸が水平になるようにすることであり，そのために脚の長さを変化させる．
+tfを参照して\texttt{map}に対する\texttt{base\_link}の位置と姿勢を調べ，目標とする位置・姿勢になるようにフィードバック制御を行う．
+フィードバック制御は単純なPID制御を実装した．
+
+PID制御は不完全微分を用いた方法で実装した．
+目標値との差分$X(s)$から制御入力$Y(s)$への伝達関数は以下のようになる．
+\begin{align*}
+  Y(s) &= \left(K_p + \frac{K_i}{s} + K_d\frac{s}{1+\tau s}\right)X(s) \\
+  &= \left(K_p + \frac{K_p}{T_i s} + K_p\frac{T_d s}{1+\eta T_d s}\right)X(s)
+\end{align*}
+積分時間を$T_i$，微分時間を$T_d$，微分ゲインを$1/\eta$とした．
+I成分とD成分は後退差分を用いて離散化する．
+I成分は
+\begin{align*}
+  Y_i[i] &= \frac{K_p}{T_i \frac{1-z^{-1}}{T}} X[i] \\
+  \frac{T_i}{T} \left(1-z^{-1}\right) Y_i[i] &= K_p X[i] \\
+  Y_i[i] &= Y_i[i-1] + \frac{T}{T_i}K_p X[i]
+\end{align*}
+D成分は
+\begin{align*}
+  Y_d[i] &= K_p \frac{T_d \frac{1-z^{-1}}{T}}{1 + \eta T_d \frac{1-z^{-1}}{T}}X[i] \\
+  &= K_p \frac{T_d - T_d z^{-1}}{\left(T + \eta T_d\right) - \eta T_d z^{-1}}X[i] \\
+  \left(T + \eta T_d\right) Y_d[i] &= \eta T_d Y_d[i-1] + K_p T_d X[i] - K_p T_d X[i-1] \\
+  Y_d[i] &= \frac{\eta T_d}{T + \eta T_d} Y_d[i-1] + \frac{K_p T_d}{T + \eta T_d} X[i] - \frac{K_p T_d}{T + \eta T_d} X[i-1]
+\end{align*}
+となる．
+
+全成分を計算するためには今回の入力$X[i]$に加えて前回の入出力$X[i-1], Y_i[i-1], Y_d[i-1]$の情報も必要になる．
+そこで，static変数を用いて前回の情報を保持するよう，以下のように実装した．
+
+\begin{quote}
+  \setlength{\baselineskip}{12pt}
+  \begin{verbatim}
+    pid_control(x) {
+      const Kp  = 0.7;
+      const Ti  = 100000;
+      const Td  = 0.0;
+      const T   = control_period;
+      const eta = 0.1;
+
+      static x_last = 0.0;
+      static yi     = 0.0;
+      static yd     = 0.0;
+
+      yi      = yi + Kp * T / Ti * x;
+      yd      = (eta * Td) / (T + eta * Td) * yd
+               + (Kp * Td) / (T + eta * Td) * x
+               - (Kp * Td) / (T + eta * Td) * x_last;
+      auto yp = Kp * x;
+      auto y  = yp + yi + yd;
+      x_last  = x;
+
+      return y;
+    }
+  \end{verbatim}
+\end{quote}
+
+ゲインの調整は資料
+\footnote{広井和男，PID制御のお話 第10回 実用形態に向けての工夫（その2）．エムエスツデー，2004. \\
+html: \url{https://www.m-system.co.jp/mstoday1/MSTback/data/2004/11/PID_T.htm} \\
+pdf: \url{https://www.m-system.co.jp/rensai/pdf/r0411.pdf}}
+を参考にした．
+微分ゲインは10\,\sim\,8（$\eta=0.1 \sim 0.125$）とされており，今回は0.1に設定した．
+最初は積分時間$T_i$は大きな値，微分時間$T_d$はゼロに設定して比例制御のみが行われるようにした状態で
+比例ゲイン$K_p$を設定してから$T_i, T_d$を定めた．
+
+試行錯誤したが微分制御は発散するので微分時間はゼロのままになっている．
+現状の実装では指令値が変化したときに，瞬間的に大きな出力が出ることが知られている．
+この問題を回避するために，微分先行型と呼ばれるPI-D制御やI-PD制御が存在している．
+これらの手法を適用することでこの問題は解消されるのかもしれないが，現状では理解が不足している．
+
+現状での動作状態の動画を撮影しTwitterにアップロードした．
+動画はこのツイート\footnote{\url{https://twitter.com/Actat85/status/1633119309986775045?s=20}}で確認できる．
 
 \end{document}
