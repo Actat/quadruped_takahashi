@@ -127,11 +127,11 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
   auto static Yd_lh      = Eigen::Vector3d(0, 0, 0);
   auto static Yd_rh      = Eigen::Vector3d(0, 0, 0);
 
-  double const Kp  = 0.7;
-  double const Ti  = 100000;
-  double const Td  = 0.0;
+  double const Kp  = 0.85;
+  double const Ti  = 0.2;
+  double const Td  = 0.000000;
   double const T   = control_period_.count() / 1000.0;
-  double const eta = 0.125;
+  double const eta = 0.1;
 
   auto Yp_lf = Kp * X_lf0;
   auto Yp_rf = Kp * X_rf0;
