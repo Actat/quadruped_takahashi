@@ -15,20 +15,17 @@ quadruped_takahashi_control_node::quadruped_takahashi_control_node()
       "~/mode", std::bind(&quadruped_takahashi_control_node::callback_mode_,
                           this, std::placeholders::_1, std::placeholders::_2));
 
-  client_b3m_mf_ = this->create_client<kondo_b3m_ros2::srv::MotorFree>(
-      "/kondo_b3m_free_motor");
-  client_b3m_spc_ =
-      this->create_client<kondo_b3m_ros2::srv::StartPositionControl>(
-          "/kondo_b3m_start_position_control");
-  client_b3m_dp_ = this->create_client<kondo_b3m_ros2::srv::DesiredPosition>(
-      "/kondo_b3m_desired_position");
-
+  client_b3m_mode_ = this->create_client<kondo_b3m_ros2::srv::ControlMode>(
+      "/kondo_b3m/control_mode");
+  client_b3m_desired_ =
+      this->create_client<kondo_b3m_ros2::srv::Desired>("/kondo_b3m/desired");
   timer_ = nullptr;
 }
 
 void quadruped_takahashi_control_node::callback_mode_(
     std::shared_ptr<quadruped_takahashi::srv::Mode::Request> const request,
     std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response) {
+  RCLCPP_INFO(this->get_logger(), "Mode change to " + request->data);
   timer_ = nullptr;
   if (request->data == "motor_free") {
     mode_motor_free_(response);
@@ -47,37 +44,37 @@ void quadruped_takahashi_control_node::callback_mode_(
 }
 void quadruped_takahashi_control_node::mode_motor_free_(
     std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response) {
-  auto req      = std::make_shared<kondo_b3m_ros2::srv::MotorFree::Request>();
-  auto v        = std::vector<uint8_t>({255});
-  req->data_len = 1;
-  req->id       = v;
-  if (!client_b3m_mf_->wait_for_service(
+  auto req  = std::make_shared<kondo_b3m_ros2::srv::ControlMode::Request>();
+  req->name = joint_list_;
+  req->mode = std::vector<std::string>(
+      {"f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f", "f"});
+  if (!client_b3m_mode_->wait_for_service(
           std::chrono::duration<int, std::milli>(5))) {
+    RCLCPP_WARN(this->get_logger(), "Failed to free b3m motor.");
     response->success = false;
     return;
   }
   response->success  = true;
-  auto future_result = client_b3m_mf_->async_send_request(req);
+  auto future_result = client_b3m_mode_->async_send_request(req);
 }
 void quadruped_takahashi_control_node::mode_start_position_control_(
     std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response) {
-  auto req =
-      std::make_shared<kondo_b3m_ros2::srv::StartPositionControl::Request>();
-  auto v        = std::vector<uint8_t>({255});
-  req->data_len = 1;
-  req->id       = v;
-  if (!client_b3m_spc_->wait_for_service(
+  auto req  = std::make_shared<kondo_b3m_ros2::srv::ControlMode::Request>();
+  req->name = joint_list_;
+  req->mode = std::vector<std::string>(
+      {"p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p", "p"});
+  if (!client_b3m_mode_->wait_for_service(
           std::chrono::duration<int, std::milli>(5))) {
     response->success = false;
     return;
   }
   response->success  = true;
-  auto future_result = client_b3m_spc_->async_send_request(req);
+  auto future_result = client_b3m_mode_->async_send_request(req);
 }
 void quadruped_takahashi_control_node::mode_stand_(
     std::shared_ptr<quadruped_takahashi::srv::Mode::Response> response) {
   timer_ = this->create_wall_timer(
-      std::chrono::microseconds(10000),
+      control_period_,
       std::bind(&quadruped_takahashi_control_node::timer_callback_stand_,
                 this));
   response->success = true;
@@ -94,34 +91,27 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
   auto ar_rh =
       ik_rh_(r_base_rh0 + Eigen::Vector3d(0, 0, -stand_hight + foot_radius));
 
-  auto arr = std::array<double, 12>({ar_lf.at(0), ar_lf.at(1), ar_lf.at(2),  //
-                                     ar_rf.at(0), ar_rf.at(1), ar_rf.at(2),  //
-                                     ar_lh.at(0), ar_lh.at(1), ar_lh.at(2),  //
-                                     ar_rh.at(0), ar_rh.at(1), ar_rh.at(2)});
-  auto req = std::make_shared<kondo_b3m_ros2::srv::DesiredPosition::Request>();
-  auto v   = std::vector<kondo_b3m_ros2::msg::DesiredPosition>(12);
-  for (int i = 0; i < 12; ++i) {
-    v.at(i).id       = i;
-    v.at(i).position = arr.at(i);
-  }
-  req->data_len = 12;
-  req->position = v;
+  auto req   = std::make_shared<kondo_b3m_ros2::srv::Desired::Request>();
+  req->name  = joint_list_;
+  req->value = std::vector<double>({ar_lf.at(0), ar_lf.at(1), ar_lf.at(2),  //
+                                    ar_rf.at(0), ar_rf.at(1), ar_rf.at(2),  //
+                                    ar_lh.at(0), ar_lh.at(1), ar_lh.at(2),  //
+                                    ar_rh.at(0), ar_rh.at(1), ar_rh.at(2)});
   auto res =
-      [this](rclcpp::Client<kondo_b3m_ros2::srv::DesiredPosition>::SharedFuture
-                 res) {
+      [this](rclcpp::Client<kondo_b3m_ros2::srv::Desired>::SharedFuture res) {
         auto response = res.get();
         if (!response->success) {
           RCLCPP_WARN(this->get_logger(),
                       "Failed to call service client 'client_b3m_dp_'.");
         }
       };
-  if (!client_b3m_dp_->wait_for_service(
+  if (!client_b3m_desired_->wait_for_service(
           std::chrono::duration<int, std::milli>(5))) {
     RCLCPP_WARN(this->get_logger(),
                 "Service client 'client_b3m_dp_' is not available.");
     return;
   }
-  auto future_result = client_b3m_dp_->async_send_request(req, res);
+  auto future_result = client_b3m_desired_->async_send_request(req, res);
   return;
 }
 

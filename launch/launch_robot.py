@@ -28,13 +28,6 @@ def generate_launch_description():
     with open(urdf_path, 'r') as infp:
         robot_desc = infp.read()
 
-    rviz_file_name = 'rviz_config.rviz'
-    rviz_path = os.path.join(
-        get_package_share_directory('quadruped_takahashi'),
-        'rviz',
-        rviz_file_name
-    )
-
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -43,6 +36,7 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': use_sim_time,
             'robot_description': robot_desc,
+            'publish_frequency': 1000.0,
         }],
         arguments=[urdf_path],
     )
@@ -51,12 +45,6 @@ def generate_launch_description():
         executable='static_transform_publisher',
         name='static_transform_publisher',
         arguments=['0', '0', '0', '0', '0', '0', 'map', 'odom']
-    )
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz2',
-        arguments=['-d', rviz_path]
     )
 
     imu_node = LifecycleNode(
@@ -94,28 +82,30 @@ def generate_launch_description():
         name='imu_complementary_filter',
         parameters=[{
             'use_mag': True,
-            'publish_tf': True,
+            'publish_tf': False,
         }]
     )
 
     kondo_b3m_ros2_node = Node(
         package='kondo_b3m_ros2',
         executable='kondo_b3m',
-        remappings=[('b3m_joint_state', 'joint_states')],
-        parameters=[{'motor_list': [
-            "{'id': 0, 'name': 'lf0', 'direction': False}",
-            "{'id': 1, 'name': 'lf1', 'direction': False}",
-            "{'id': 2, 'name': 'lf2', 'direction': False}",
-            "{'id': 3, 'name': 'rf0', 'direction': False}",
-            "{'id': 4, 'name': 'rf1'}",
-            "{'id': 5, 'name': 'rf2'}",
-            "{'id': 6, 'name': 'lh0'}",
-            "{'id': 7, 'name': 'lh1', 'direction': False}",
-            "{'id': 8, 'name': 'lh2', 'direction': False}",
-            "{'id': 9, 'name': 'rh0'}",
-            "{'id': 10, 'name': 'rh1'}",
-            "{'id': 11, 'name': 'rh2'}"
-        ]}],
+        remappings=[('~/joint_states', '/joint_states')],
+        parameters=[{
+            'publish_frequency': 50,
+            'motor_list': [
+                "{'id': 0, 'model': 'B3M-SC-1170-A', 'name': 'lf0', 'direction': False}",
+                "{'id': 1, 'model': 'B3M-SC-1170-A', 'name': 'lf1', 'direction': False}",
+                "{'id': 2, 'model': 'B3M-SC-1170-A', 'name': 'lf2', 'direction': False}",
+                "{'id': 3, 'model': 'B3M-SC-1170-A', 'name': 'rf0', 'direction': False}",
+                "{'id': 4, 'model': 'B3M-SC-1170-A', 'name': 'rf1'}",
+                "{'id': 5, 'model': 'B3M-SC-1170-A', 'name': 'rf2'}",
+                "{'id': 6, 'model': 'B3M-SC-1170-A', 'name': 'lh0'}",
+                "{'id': 7, 'model': 'B3M-SC-1170-A', 'name': 'lh1', 'direction': False}",
+                "{'id': 8, 'model': 'B3M-SC-1170-A', 'name': 'lh2', 'direction': False}",
+                "{'id': 9, 'model': 'B3M-SC-1170-A', 'name': 'rh0'}",
+                "{'id': 10, 'model': 'B3M-SC-1170-A', 'name': 'rh1'}",
+                "{'id': 11, 'model': 'B3M-SC-1170-A', 'name': 'rh2'}"
+            ]}],
     )
 
     quadruped_takahashi_odometry_node = Node(
@@ -136,7 +126,6 @@ def generate_launch_description():
     ld.add_action(imu_node)
     ld.add_action(imu_configure)
     ld.add_action(imu_complementary_filter_node)
-    ld.add_action(rviz_node)
     ld.add_action(kondo_b3m_ros2_node)
     ld.add_action(quadruped_takahashi_odometry_node)
     ld.add_action(quadruped_takahashi_control_node)

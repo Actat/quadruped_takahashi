@@ -28,10 +28,25 @@ void quadruped_takahashi_odometry::callback_imu_(
 
   auto stamp   = msg->header.stamp;
   auto timeout = tf2::durationFromSec(1.0);
-  auto tf_lf4  = lookup_transform_("base_link", "lfleg4", stamp, timeout);
-  auto tf_rf4  = lookup_transform_("base_link", "rfleg4", stamp, timeout);
-  auto tf_lh4  = lookup_transform_("base_link", "lhleg4", stamp, timeout);
-  auto tf_rh4  = lookup_transform_("base_link", "rhleg4", stamp, timeout);
+  geometry_msgs::msg::TransformStamped tf_lf4, tf_rf4, tf_lh4, tf_rh4;
+  try {
+    tf_lf4 = lookup_transform_("base_link", "lfleg4", stamp, timeout);
+    tf_rf4 = lookup_transform_("base_link", "rfleg4", stamp, timeout);
+    tf_lh4 = lookup_transform_("base_link", "lhleg4", stamp, timeout);
+    tf_rh4 = lookup_transform_("base_link", "rhleg4", stamp, timeout);
+  } catch (tf2::LookupException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  } catch (tf2::ConnectivityException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  } catch (tf2::ExtrapolationException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  } catch (tf2::InvalidArgumentException const &e) {
+    RCLCPP_WARN(this->get_logger(), e.what());
+    return;
+  }
 
   auto vec_lf4       = tfq_odom_base * vect_(tf_lf4);
   auto vec_rf4       = tfq_odom_base * vect_(tf_rf4);
