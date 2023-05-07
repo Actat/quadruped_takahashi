@@ -111,7 +111,6 @@ def generate_launch_description():
     quadruped_takahashi_odometry_node = Node(
         package='quadruped_takahashi',
         executable='quadruped_takahashi_odometry_node',
-        remappings=[('~/tf', 'tf')],
     )
 
     quadruped_takahashi_control_node = Node(

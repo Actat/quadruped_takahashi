@@ -4,10 +4,12 @@
 #include <array>
 #include <chrono>
 #include <eigen3/Eigen/Geometry>
+#include "geometry_msgs/msg/vector3_stamped.hpp"
 #include "kondo_b3m_ros2/srv/control_mode.hpp"
 #include "kondo_b3m_ros2/srv/desired.hpp"
 #include "quadruped_takahashi/srv/mode.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "tf2_msgs/msg/tf_message.hpp"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
@@ -58,14 +60,6 @@ private:
   std::array<double, 3> ik_rh_(Eigen::Vector3d const &r_base_rh4);
   std::array<double, 3> ik_xf_(Eigen::Vector3d const &r_xf0_rf4);
   std::array<double, 3> ik_xh_(Eigen::Vector3d const &r_xh0_lh4);
-
-  geometry_msgs::msg::TransformStamped lookup_transform_(
-      std::string const target_frame,
-      std::string const source_frame,
-      builtin_interfaces::msg::Time const &time_stamp,
-      tf2::Duration const &timeout);
-  Eigen::Quaterniond quat_(geometry_msgs::msg::TransformStamped const &tf);
-  Eigen::Vector3d vect_(geometry_msgs::msg::TransformStamped const &tf);
 
   double clamp_(double value, double low, double high);
 };
