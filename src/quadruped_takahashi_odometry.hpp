@@ -8,6 +8,7 @@
 #include "sensor_msgs/msg/imu.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
 #include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
 
 class quadruped_takahashi_odometry : public rclcpp::Node {
@@ -31,7 +32,7 @@ private:
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_imu_;
-  rclcpp::Publisher<tf2_msgs::msg::TFMessage>::SharedPtr publisher_tf_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> publisher_tf_;
 
   void callback_imu_(sensor_msgs::msg::Imu::SharedPtr const msg);
 

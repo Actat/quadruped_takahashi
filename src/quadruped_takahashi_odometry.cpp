@@ -16,8 +16,7 @@ quadruped_takahashi_odometry::quadruped_takahashi_odometry()
       "/imu/data", 10,
       std::bind(&quadruped_takahashi_odometry::callback_imu_, this,
                 std::placeholders::_1));
-  publisher_tf_ =
-      this->create_publisher<tf2_msgs::msg::TFMessage>("~/tf", rclcpp::QoS(10));
+  publisher_tf_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 }
 
 void quadruped_takahashi_odometry::callback_imu_(
@@ -57,22 +56,21 @@ void quadruped_takahashi_odometry::callback_imu_(
       foot_radius -
           std::min({vec_lf4.z(), vec_rf4.z(), vec_lh4.z(), vec_rh4.z()}));
 
-  auto tfmsg                    = tf2_msgs::msg::TFMessage();
-  tfmsg.transforms              = {geometry_msgs::msg::TransformStamped()};
-  tfmsg.transforms.at(0).header = msg->header;
-  tfmsg.transforms.at(0).header.frame_id = "odom";
-  tfmsg.transforms.at(0).child_frame_id  = "base_link";
-  tfmsg.transforms.at(0).transform       = geometry_msgs::msg::Transform();
-  tfmsg.transforms.at(0).transform.translation = geometry_msgs::msg::Vector3();
-  tfmsg.transforms.at(0).transform.translation.x = vec_odom_base.x();
-  tfmsg.transforms.at(0).transform.translation.y = vec_odom_base.y();
-  tfmsg.transforms.at(0).transform.translation.z = vec_odom_base.z();
-  tfmsg.transforms.at(0).transform.rotation = geometry_msgs::msg::Quaternion();
-  tfmsg.transforms.at(0).transform.rotation.w = tfq_odom_base.w();
-  tfmsg.transforms.at(0).transform.rotation.x = tfq_odom_base.x();
-  tfmsg.transforms.at(0).transform.rotation.y = tfq_odom_base.y();
-  tfmsg.transforms.at(0).transform.rotation.z = tfq_odom_base.z();
-  publisher_tf_->publish(tfmsg);
+  auto tfmsg                    = geometry_msgs::msg::TransformStamped();
+  tfmsg.header                  = msg->header;
+  tfmsg.header.frame_id         = "odom";
+  tfmsg.child_frame_id          = "base_link";
+  tfmsg.transform               = geometry_msgs::msg::Transform();
+  tfmsg.transform.translation   = geometry_msgs::msg::Vector3();
+  tfmsg.transform.translation.x = vec_odom_base.x();
+  tfmsg.transform.translation.y = vec_odom_base.y();
+  tfmsg.transform.translation.z = vec_odom_base.z();
+  tfmsg.transform.rotation      = geometry_msgs::msg::Quaternion();
+  tfmsg.transform.rotation.w    = tfq_odom_base.w();
+  tfmsg.transform.rotation.x    = tfq_odom_base.x();
+  tfmsg.transform.rotation.y    = tfq_odom_base.y();
+  tfmsg.transform.rotation.z    = tfq_odom_base.z();
+  publisher_tf_->sendTransform(tfmsg);
 }
 
 geometry_msgs::msg::TransformStamped
