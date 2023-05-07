@@ -56,21 +56,18 @@ void quadruped_takahashi_odometry::callback_imu_(
       foot_radius -
           std::min({vec_lf4.z(), vec_rf4.z(), vec_lh4.z(), vec_rh4.z()}));
 
-  auto tfmsg                    = geometry_msgs::msg::TransformStamped();
-  tfmsg.header                  = msg->header;
-  tfmsg.header.frame_id         = "odom";
-  tfmsg.child_frame_id          = "base_link";
-  tfmsg.transform               = geometry_msgs::msg::Transform();
-  tfmsg.transform.translation   = geometry_msgs::msg::Vector3();
-  tfmsg.transform.translation.x = vec_odom_base.x();
-  tfmsg.transform.translation.y = vec_odom_base.y();
-  tfmsg.transform.translation.z = vec_odom_base.z();
-  tfmsg.transform.rotation      = geometry_msgs::msg::Quaternion();
-  tfmsg.transform.rotation.w    = tfq_odom_base.w();
-  tfmsg.transform.rotation.x    = tfq_odom_base.x();
-  tfmsg.transform.rotation.y    = tfq_odom_base.y();
-  tfmsg.transform.rotation.z    = tfq_odom_base.z();
-  publisher_tf_->sendTransform(tfmsg);
+  geometry_msgs::msg::TransformStamped tfs;
+  tfs.header                  = msg->header;
+  tfs.header.frame_id         = "odom";
+  tfs.child_frame_id          = "base_link";
+  tfs.transform.translation.x = vec_odom_base.x();
+  tfs.transform.translation.y = vec_odom_base.y();
+  tfs.transform.translation.z = vec_odom_base.z();
+  tfs.transform.rotation.w    = tfq_odom_base.w();
+  tfs.transform.rotation.x    = tfq_odom_base.x();
+  tfs.transform.rotation.y    = tfq_odom_base.y();
+  tfs.transform.rotation.z    = tfq_odom_base.z();
+  publisher_tf_->sendTransform(tfs);
 }
 
 geometry_msgs::msg::TransformStamped
