@@ -32,7 +32,7 @@ private:
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_imu_;
-  std::unique_ptr<tf2_ros::TransformBroadcaster> publisher_tf_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
   void callback_imu_(sensor_msgs::msg::Imu::SharedPtr const msg);
 
