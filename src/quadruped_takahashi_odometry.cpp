@@ -16,7 +16,7 @@ quadruped_takahashi_odometry::quadruped_takahashi_odometry()
       "/imu/data", 10,
       std::bind(&quadruped_takahashi_odometry::callback_imu_, this,
                 std::placeholders::_1));
-  publisher_tf_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+  tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 }
 
 void quadruped_takahashi_odometry::callback_imu_(
@@ -67,7 +67,7 @@ void quadruped_takahashi_odometry::callback_imu_(
   tfs.transform.rotation.x    = tfq_odom_base.x();
   tfs.transform.rotation.y    = tfq_odom_base.y();
   tfs.transform.rotation.z    = tfq_odom_base.z();
-  publisher_tf_->sendTransform(tfs);
+  tf_broadcaster_->sendTransform(tfs);
 }
 
 geometry_msgs::msg::TransformStamped
