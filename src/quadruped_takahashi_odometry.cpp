@@ -28,20 +28,21 @@ void quadruped_takahashi_odometry::callback_imu_(
       Eigen::Quaterniond(std::cos(-M_PI_4), 0, 0, std::sin(-M_PI_4));
 
   geometry_msgs::msg::PointStamped ps_lf, ps_rf, ps_lh, ps_rh;
-  ps_lf.header = ps_rf.header = ps_lh.header = ps_rh.header = msg->header;
-  ps_lf.header.frame_id                                     = "lfleg4";
-  ps_rf.header.frame_id                                     = "rfleg4";
-  ps_lh.header.frame_id                                     = "lhleg4";
-  ps_rh.header.frame_id                                     = "rhleg4";
+  ps_lf.header.stamp = ps_rf.header.stamp =  //
+      ps_lh.header.stamp = ps_rh.header.stamp = msg->header.stamp;
+  ps_lf.header.frame_id                       = "lfleg4";
+  ps_rf.header.frame_id                       = "rfleg4";
+  ps_lh.header.frame_id                       = "lhleg4";
+  ps_rh.header.frame_id                       = "rhleg4";
   ps_lf.point.x = ps_rf.point.x = ps_lh.point.x = ps_rh.point.x = 0.;
   ps_lf.point.y = ps_rf.point.y = ps_lh.point.y = ps_rh.point.y = 0.;
   ps_lf.point.z = ps_rf.point.z = ps_lh.point.z = ps_rh.point.z = 0.;
   auto timeout = tf2::durationFromSec(1.0);
   try {
-    ps_lf = tf_buffer_->transform(ps_lf, "base_link");
-    ps_rf = tf_buffer_->transform(ps_rf, "base_link");
-    ps_lh = tf_buffer_->transform(ps_lh, "base_link");
-    ps_rh = tf_buffer_->transform(ps_rh, "base_link");
+    ps_lf = tf_buffer_->transform(ps_lf, "base_link", timeout);
+    ps_rf = tf_buffer_->transform(ps_rf, "base_link", timeout);
+    ps_lh = tf_buffer_->transform(ps_lh, "base_link", timeout);
+    ps_rh = tf_buffer_->transform(ps_rh, "base_link", timeout);
   } catch (tf2::LookupException const &e) {
     RCLCPP_WARN(this->get_logger(), e.what());
     return;
