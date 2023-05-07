@@ -122,10 +122,10 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
     return;
   }
 
-  auto X_lf0 = Eigen::Vector3d(0, 0, stand_hight - v_lf.vector.z);
-  auto X_rf0 = Eigen::Vector3d(0, 0, stand_hight - v_rf.vector.z);
-  auto X_lh0 = Eigen::Vector3d(0, 0, stand_hight - v_lh.vector.z);
-  auto X_rh0 = Eigen::Vector3d(0, 0, stand_hight - v_rh.vector.z);
+  auto X_lf0 = Eigen::Vector3d(0, 0, -v_lf.vector.z);
+  auto X_rf0 = Eigen::Vector3d(0, 0, -v_rf.vector.z);
+  auto X_lh0 = Eigen::Vector3d(0, 0, -v_lh.vector.z);
+  auto X_rh0 = Eigen::Vector3d(0, 0, -v_rh.vector.z);
 
   auto static X_lf0_last = Eigen::Vector3d(0, 0, 0);
   auto static X_rf0_last = Eigen::Vector3d(0, 0, 0);
