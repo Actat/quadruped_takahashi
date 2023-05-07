@@ -4,10 +4,12 @@
 #include <array>
 #include <chrono>
 #include <eigen3/Eigen/Geometry>
+#include "geometry_msgs/msg/point_stamped.h"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/imu.hpp"
-#include "tf2_msgs/msg/tf_message.hpp"
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_broadcaster.h"
 #include "tf2_ros/transform_listener.h"
 
 class quadruped_takahashi_odometry : public rclcpp::Node {
@@ -31,18 +33,9 @@ private:
 
   rclcpp::TimerBase::SharedPtr timer_;
   rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr subscription_imu_;
-  rclcpp::Publisher<tf2_msgs::msg::TFMessage>::SharedPtr publisher_tf_;
+  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
   void callback_imu_(sensor_msgs::msg::Imu::SharedPtr const msg);
-
-  geometry_msgs::msg::TransformStamped lookup_transform_(
-      std::string const target_frame,
-      std::string const source_frame,
-      builtin_interfaces::msg::Time const &time_stamp,
-      tf2::Duration const &timeout);
-  Eigen::Quaterniond quat_(geometry_msgs::msg::TransformStamped const &tf);
-  Eigen::Quaterniond quat_(sensor_msgs::msg::Imu::SharedPtr const msg);
-  Eigen::Vector3d vect_(geometry_msgs::msg::TransformStamped const &tf);
 
   double clamp_(double value, double low, double high);
 };

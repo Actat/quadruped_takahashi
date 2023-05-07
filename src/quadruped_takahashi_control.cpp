@@ -82,15 +82,32 @@ void quadruped_takahashi_control_node::mode_stand_(
 }
 
 void quadruped_takahashi_control_node::timer_callback_stand_() {
-  auto now     = this->get_clock()->now();
-  auto timeout = tf2::durationFromSec(1.0);
-  geometry_msgs::msg::TransformStamped tf_base, tf_lf0, tf_rf0, tf_lh0, tf_rh0;
+  auto now = this->get_clock()->now();
+  geometry_msgs::msg::Vector3Stamped v_lf, v_rf, v_lh, v_rh;
+  v_lf.header.stamp = v_rf.header.stamp =  //
+      v_lh.header.stamp = v_rh.header.stamp = now;
+  v_lf.header.frame_id                      = "lfleg0";
+  v_rf.header.frame_id                      = "rfleg0";
+  v_lh.header.frame_id                      = "lhleg0";
+  v_rh.header.frame_id                      = "rhleg0";
+  v_lf.vector.x                             = r_base_lf0(0);
+  v_lf.vector.y                             = r_base_lf0(1);
+  v_lf.vector.z                             = r_base_lf0(2);
+  v_rf.vector.x                             = r_base_rf0(0);
+  v_rf.vector.y                             = r_base_rf0(1);
+  v_rf.vector.z                             = r_base_rf0(2);
+  v_lh.vector.x                             = r_base_lh0(0);
+  v_lh.vector.y                             = r_base_lh0(1);
+  v_lh.vector.z                             = r_base_lh0(2);
+  v_rh.vector.x                             = r_base_rh0(0);
+  v_rh.vector.y                             = r_base_rh0(1);
+  v_rh.vector.z                             = r_base_rh0(2);
+  auto timeout                              = tf2::durationFromSec(1.0);
   try {
-    tf_base = lookup_transform_("map", "base_link", now, timeout);
-    tf_lf0  = lookup_transform_("base_link", "lfleg0", now, timeout);
-    tf_rf0  = lookup_transform_("base_link", "rfleg0", now, timeout);
-    tf_lh0  = lookup_transform_("base_link", "lhleg0", now, timeout);
-    tf_rh0  = lookup_transform_("base_link", "rhleg0", now, timeout);
+    v_lf = tf_buffer_->transform(v_lf, "map", timeout);
+    v_rf = tf_buffer_->transform(v_rf, "map", timeout);
+    v_lh = tf_buffer_->transform(v_lh, "map", timeout);
+    v_rh = tf_buffer_->transform(v_rh, "map", timeout);
   } catch (tf2::LookupException const &e) {
     RCLCPP_WARN(this->get_logger(), e.what());
     return;
@@ -105,14 +122,10 @@ void quadruped_takahashi_control_node::timer_callback_stand_() {
     return;
   }
 
-  auto X_lf0 = Eigen::Vector3d(
-      0, 0, (vect_(tf_lf0) - quat_(tf_base) * vect_(tf_lf0)).z());
-  auto X_rf0 = Eigen::Vector3d(
-      0, 0, (vect_(tf_rf0) - quat_(tf_base) * vect_(tf_rf0)).z());
-  auto X_lh0 = Eigen::Vector3d(
-      0, 0, (vect_(tf_lh0) - quat_(tf_base) * vect_(tf_lh0)).z());
-  auto X_rh0 = Eigen::Vector3d(
-      0, 0, (vect_(tf_rh0) - quat_(tf_base) * vect_(tf_rh0)).z());
+  auto X_lf0 = Eigen::Vector3d(0, 0, -v_lf.vector.z);
+  auto X_rf0 = Eigen::Vector3d(0, 0, -v_rf.vector.z);
+  auto X_lh0 = Eigen::Vector3d(0, 0, -v_lh.vector.z);
+  auto X_rh0 = Eigen::Vector3d(0, 0, -v_rh.vector.z);
 
   auto static X_lf0_last = Eigen::Vector3d(0, 0, 0);
   auto static X_rf0_last = Eigen::Vector3d(0, 0, 0);
@@ -288,31 +301,6 @@ std::array<double, 3> quadruped_takahashi_control_node::ik_xh_(
 
   std::array<double, 3> ar = {theta_xx0, theta_xx1, theta_xx2};
   return ar;
-}
-
-geometry_msgs::msg::TransformStamped
-quadruped_takahashi_control_node::lookup_transform_(
-    std::string const target_frame,
-    std::string const source_frame,
-    builtin_interfaces::msg::Time const &time_stamp,
-    tf2::Duration const &timeout) {
-  return tf_buffer_->lookupTransform(
-      target_frame, source_frame,
-      tf2::TimePoint(std::chrono::seconds(time_stamp.sec) +
-                     std::chrono::nanoseconds(time_stamp.nanosec)),
-      timeout);
-}
-
-Eigen::Quaterniond quadruped_takahashi_control_node::quat_(
-    geometry_msgs::msg::TransformStamped const &tf) {
-  return Eigen::Quaterniond(tf.transform.rotation.w, tf.transform.rotation.x,
-                            tf.transform.rotation.y, tf.transform.rotation.z);
-}
-
-Eigen::Vector3d quadruped_takahashi_control_node::vect_(
-    geometry_msgs::msg::TransformStamped const &tf) {
-  return Eigen::Vector3d(tf.transform.translation.x, tf.transform.translation.y,
-                         tf.transform.translation.z);
 }
 
 double quadruped_takahashi_control_node::clamp_(double value,
