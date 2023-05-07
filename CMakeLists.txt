@@ -23,8 +23,10 @@ find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(tf2_msgs REQUIRED)
+find_package(tf2_geometry_msgs REQUIRED)
 find_package(kondo_b3m_ros2 REQUIRED)
 
 set(srv_files
@@ -41,8 +43,10 @@ add_executable(quadruped_takahashi_odometry_node
 ament_target_dependencies(quadruped_takahashi_odometry_node
   rclcpp
   tf2_ros
-  sensor_msgs
   tf2_msgs
+  tf2_geometry_msgs
+  geometry_msgs
+  sensor_msgs
 )
 target_include_directories(quadruped_takahashi_odometry_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
