@@ -60,6 +60,8 @@ ament_target_dependencies(quadruped_takahashi_control_node
   rclcpp
   tf2_ros
   tf2_msgs
+  tf2_geometry_msgs
+  geometry_msgs
   kondo_b3m_ros2
 )
 target_include_directories(quadruped_takahashi_control_node PUBLIC
