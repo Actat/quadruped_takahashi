@@ -90,25 +90,22 @@ def generate_launch_description():
     kondo_b3m_ros2_node = Node(
         package='kondo_b3m_ros2',
         executable='kondo_b3m',
-        parameters=[{
-        }],
     )
     kondo_b3m_util_node = Node(
         package='kondo_b3m_ros2',
         executable='kondo_b3m_util',
-        name='kondo_b3m_util',
         parameters=[{
             'publish_frequency': 50,
             'motor_list': [
-                "{'id': 0, 'name': 'lf0', 'direction': False}",
-                "{'id': 1, 'name': 'lf1', 'direction': False}",
-                "{'id': 2, 'name': 'lf2', 'direction': False}",
-                "{'id': 3, 'name': 'rf0', 'direction': False}",
+                "{'id': 0, 'name': 'lf0'}",
+                "{'id': 1, 'name': 'lf1'}",
+                "{'id': 2, 'name': 'lf2'}",
+                "{'id': 3, 'name': 'rf0'}",
                 "{'id': 4, 'name': 'rf1'}",
                 "{'id': 5, 'name': 'rf2'}",
                 "{'id': 6, 'name': 'lh0'}",
-                "{'id': 7, 'name': 'lh1', 'direction': False}",
-                "{'id': 8, 'name': 'lh2', 'direction': False}",
+                "{'id': 7, 'name': 'lh1'}",
+                "{'id': 8, 'name': 'lh2'}",
                 "{'id': 9, 'name': 'rh0'}",
                 "{'id': 10, 'name': 'rh1'}",
                 "{'id': 11, 'name': 'rh2'}"
